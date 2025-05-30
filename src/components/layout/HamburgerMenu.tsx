@@ -31,8 +31,9 @@ const menuItems: MenuItem[] = [
   {
     title: '수학 계산기',
     items: [
-      { name: '단위 변환기', path: '/math/unit-converter' },
       { name: '기본 계산기', path: '/math/basic' },
+      { name: '공학용 계산기', path: '/math/scientific' },
+      { name: '단위 변환기', path: '/math/unit-converter' },
     ],
   },
 ];
