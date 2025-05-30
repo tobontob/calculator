@@ -55,14 +55,14 @@ export default function StartupCostCalculator() {
 
   const [result, setResult] = useState<StartupCostResult | null>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, category?: string) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, category?: 'initialCosts' | 'monthlyExpenses') => {
     const { name, value } = e.target;
     
     if (category) {
       setInputs(prev => ({
         ...prev,
         [category]: {
-          ...prev[category as keyof StartupCostInputs],
+          ...prev[category],
           [name]: value
         }
       }));
