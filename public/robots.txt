@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Allow all crawlers
+User-agent: *
+Allow: /math/
+Allow: /financial/
+Allow: /health/
+
+# Prevent crawling of admin or private pages
+Disallow: /admin/
+Disallow: /private/ 

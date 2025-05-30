@@ -3,10 +3,36 @@ import type { Metadata } from 'next';
 import HamburgerMenu from '@/components/layout/HamburgerMenu';
 import Link from 'next/link';
 import { headers } from 'next/headers';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: '종합 계산기',
-  description: '다양한 계산기를 한 곳에서 편리하게 사용하세요.',
+  title: '종합 계산기 | 무료 온라인 계산기 모음',
+  description: '단위변환, 수학, 금융, 건강 등 다양한 계산기를 제공하는 무료 온라인 계산기 사이트입니다. 간단하고 정확한 계산을 도와드립니다.',
+  keywords: '계산기, 단위변환기, 공학용계산기, 대출계산기, BMI계산기, 이자계산기, 온라인계산기, 무료계산기',
+  authors: [{ name: '종합 계산기' }],
+  openGraph: {
+    title: '종합 계산기 | 무료 온라인 계산기 모음',
+    description: '단위변환, 수학, 금융, 건강 등 다양한 계산기를 제공하는 무료 온라인 계산기 사이트입니다.',
+    type: 'website',
+    locale: 'ko_KR',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+  },
+  verification: {
+    google: 'google-site-verification=YOUR_VERIFICATION_CODE', // Google Search Console 인증 코드
+    naver: 'naver-site-verification=YOUR_VERIFICATION_CODE', // 네이버 웹마스터 도구 인증 코드
+  },
+  alternates: {
+    canonical: 'https://your-domain.com', // 실제 도메인으로 변경 필요
+  },
 };
 
 export default function RootLayout({
@@ -16,7 +42,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body>
+      <body className={inter.className}>
         <div id="header-wrapper" className="fixed top-0 left-0 right-0 z-30 transition-colors duration-500">
           <header className="bg-white shadow-sm">
             <div className="container mx-auto px-4 h-16 flex items-center justify-center">
