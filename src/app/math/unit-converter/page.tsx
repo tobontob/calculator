@@ -57,6 +57,166 @@ const unitCategories: UnitCategory[] = [
       },
     ],
   },
+  {
+    name: '넓이',
+    units: [
+      {
+        name: '제곱미터 (m²)',
+        toBase: (v) => v,
+        fromBase: (v) => v,
+      },
+      {
+        name: '제곱킬로미터 (km²)',
+        toBase: (v) => v * 1000000,
+        fromBase: (v) => v / 1000000,
+      },
+      {
+        name: '헥타르 (ha)',
+        toBase: (v) => v * 10000,
+        fromBase: (v) => v / 10000,
+      },
+      {
+        name: '평',
+        toBase: (v) => v * 3.3058,
+        fromBase: (v) => v / 3.3058,
+      },
+    ],
+  },
+  {
+    name: '부피',
+    units: [
+      {
+        name: '밀리리터 (mL)',
+        toBase: (v) => v / 1000,
+        fromBase: (v) => v * 1000,
+      },
+      {
+        name: '리터 (L)',
+        toBase: (v) => v,
+        fromBase: (v) => v,
+      },
+      {
+        name: '세제곱미터 (m³)',
+        toBase: (v) => v * 1000,
+        fromBase: (v) => v / 1000,
+      },
+    ],
+  },
+  {
+    name: '온도',
+    units: [
+      {
+        name: '섭씨 (°C)',
+        toBase: (v) => v,
+        fromBase: (v) => v,
+      },
+      {
+        name: '화씨 (°F)',
+        toBase: (v) => (v - 32) * 5/9,
+        fromBase: (v) => (v * 9/5) + 32,
+      },
+      {
+        name: '켈빈 (K)',
+        toBase: (v) => v - 273.15,
+        fromBase: (v) => v + 273.15,
+      },
+    ],
+  },
+  {
+    name: '압력',
+    units: [
+      {
+        name: '파스칼 (Pa)',
+        toBase: (v) => v,
+        fromBase: (v) => v,
+      },
+      {
+        name: '기압 (atm)',
+        toBase: (v) => v * 101325,
+        fromBase: (v) => v / 101325,
+      },
+      {
+        name: '바 (bar)',
+        toBase: (v) => v * 100000,
+        fromBase: (v) => v / 100000,
+      },
+      {
+        name: '수은주 밀리미터 (mmHg)',
+        toBase: (v) => v * 133.322,
+        fromBase: (v) => v / 133.322,
+      },
+    ],
+  },
+  {
+    name: '속도',
+    units: [
+      {
+        name: '미터/초 (m/s)',
+        toBase: (v) => v,
+        fromBase: (v) => v,
+      },
+      {
+        name: '킬로미터/시 (km/h)',
+        toBase: (v) => v / 3.6,
+        fromBase: (v) => v * 3.6,
+      },
+      {
+        name: '마일/시 (mph)',
+        toBase: (v) => v / 2.237,
+        fromBase: (v) => v * 2.237,
+      },
+    ],
+  },
+  {
+    name: '연비',
+    units: [
+      {
+        name: 'km/L',
+        toBase: (v) => v,
+        fromBase: (v) => v,
+      },
+      {
+        name: 'L/100km',
+        toBase: (v) => 100 / v,
+        fromBase: (v) => 100 / v,
+      },
+      {
+        name: 'MPG(미국)',
+        toBase: (v) => v * 0.425144,
+        fromBase: (v) => v / 0.425144,
+      },
+    ],
+  },
+  {
+    name: '데이터량',
+    units: [
+      {
+        name: '바이트 (B)',
+        toBase: (v) => v,
+        fromBase: (v) => v,
+      },
+      {
+        name: '킬로바이트 (KB)',
+        toBase: (v) => v * 1024,
+        fromBase: (v) => v / 1024,
+      },
+      {
+        name: '메가바이트 (MB)',
+        toBase: (v) => v * 1024 * 1024,
+        fromBase: (v) => v / (1024 * 1024),
+      },
+      {
+        name: '기가바이트 (GB)',
+        toBase: (v) => v * 1024 * 1024 * 1024,
+        fromBase: (v) => v / (1024 * 1024 * 1024),
+      },
+      {
+        name: '테라바이트 (TB)',
+        toBase: (v) => v * 1024 * 1024 * 1024 * 1024,
+        fromBase: (v) => v / (1024 * 1024 * 1024 * 1024),
+      },
+    ],
+  },
 ];
 
 export default function UnitConverter() {
