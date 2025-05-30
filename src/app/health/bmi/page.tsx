@@ -26,7 +26,7 @@ export default function BMICalculator() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-md">
-      <h1 className="text-3xl font-bold text-center mb-8">BMI 계산기</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">체질량 지수(BMI) 계산기</h1>
       
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="mb-4">
@@ -65,7 +65,7 @@ export default function BMICalculator() {
         {bmi !== null && (
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <p className="text-lg font-semibold">
-              당신의 BMI: {bmi}
+              당신의 체질량 지수(BMI): {bmi}
             </p>
             <p className="text-md mt-2">
               판정: <span className="font-semibold">{status}</span>

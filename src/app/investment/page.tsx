@@ -2,29 +2,29 @@
 
 import Link from 'next/link';
 
-export default function FinancialCalculators() {
+export default function InvestmentCalculators() {
   const calculators = [
     {
-      name: '대출 계산기',
-      description: '대출 원리금 상환액과 이자를 계산합니다.',
-      path: '/financial/loan',
+      name: '주식 투자수익 계산기',
+      description: '주식 투자의 수익률과 손익을 계산합니다.',
+      path: '/investment/stock',
     },
     {
-      name: '이자 계산기',
-      description: '예금과 대출의 이자를 계산합니다.',
-      path: '/financial/interest',
+      name: '펀드 수익률 계산기',
+      description: '펀드 투자의 수익률을 계산합니다.',
+      path: '/investment/fund',
     },
     {
-      name: '예적금 계산기',
-      description: '정기예금과 적금의 만기 수령액을 계산합니다.',
-      path: '/financial/deposit',
+      name: '복리 수익률 계산기',
+      description: '복리 효과를 고려한 투자 수익률을 계산합니다.',
+      path: '/investment/compound',
     },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <h1 className="text-2xl font-bold text-center mb-8">재무 계산기</h1>
+        <h1 className="text-2xl font-bold text-center mb-8">투자 계산기</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {calculators.map((calculator) => (
             <Link

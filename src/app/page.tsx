@@ -14,7 +14,7 @@ const categories = [
   {
     title: '건강 계산기',
     items: [
-      { name: 'BMI 계산기', path: '/health/bmi' },
+      { name: '체질량 지수(BMI) 계산기', path: '/health/bmi' },
       { name: '칼로리 계산기', path: '/health/calorie' },
       { name: '체지방률 계산기', path: '/health/bodyfat' },
     ],
@@ -128,11 +128,11 @@ export default function Home() {
 
         {/* 세 번째 줄: 생활금융, 사업/창업 */}
         <div className="grid md:grid-cols-3 gap-6">
-          {categories.slice(6).map((category) => (
-            <div key={category.title} className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-semibold mb-4">{category.title}</h2>
+          <div className="md:col-start-1 md:col-span-1">
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-2xl font-semibold mb-4">{categories[6].title}</h2>
               <ul className="space-y-2">
-                {category.items.map((item) => (
+                {categories[6].items.map((item) => (
                   <li key={item.path}>
                     <Link 
                       href={item.path}
@@ -144,9 +144,24 @@ export default function Home() {
                 ))}
               </ul>
             </div>
-          ))}
-          {/* 마지막 줄의 빈 공간을 채우기 위한 더미 div */}
-          <div className="hidden md:block"></div>
+          </div>
+          <div className="md:col-start-2 md:col-span-1">
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-2xl font-semibold mb-4">{categories[7].title}</h2>
+              <ul className="space-y-2">
+                {categories[7].items.map((item) => (
+                  <li key={item.path}>
+                    <Link 
+                      href={item.path}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </main>
