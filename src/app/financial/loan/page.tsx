@@ -119,56 +119,50 @@ export default function LoanCalculator() {
       <div className="bg-white p-6 rounded-lg shadow-md mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               대출금액 (원)
             </label>
             <input
               type="number"
               value={principal}
               onChange={(e) => setPrincipal(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="대출금액을 입력하세요"
-              min="0"
             />
           </div>
-
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               연이자율 (%)
             </label>
             <input
               type="number"
               value={interestRate}
               onChange={(e) => setInterestRate(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="연이자율을 입력하세요"
-              min="0"
               step="0.1"
             />
           </div>
-
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              대출기간 (년)
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              대출기간 (개월)
             </label>
             <input
               type="number"
               value={loanTerm}
               onChange={(e) => setLoanTerm(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="대출기간을 입력하세요"
-              min="1"
             />
           </div>
-
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               상환방식
             </label>
             <select
               value={paymentType}
               onChange={(e) => setPaymentType(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="bullet">만기일시상환</option>
               <option value="equal-principal">원금균등분할상환</option>
@@ -185,40 +179,22 @@ export default function LoanCalculator() {
         </button>
       </div>
 
-      <div className="bg-gray-50 p-6 rounded-lg shadow mb-8">
-        <h2 className="text-xl font-bold mb-4">이용안내</h2>
-        <div className="space-y-4 text-sm md:text-base">
-          <div>
-            <p className="font-semibold mb-1">만기일시상환</p>
-            <p className="text-gray-600">원금은 만기일에 일시상환하고 이자는 매월 후 이자로 납부하며, 원금은 만기일 이전이라도 전액 또는 일부 원금상환이 가능합니다.</p>
-          </div>
-          <div>
-            <p className="font-semibold mb-1">원금균등분할상환</p>
-            <p className="text-gray-600">대출원금을 대출기간으로 균등하게 나누어 매월 일정한 금액을 상환하고 이자는 매월 상환으로 줄어든 대출 잔액에 대해서만 지급하는 방식입니다.</p>
-          </div>
-          <div>
-            <p className="font-semibold mb-1">원리금균등분할상환</p>
-            <p className="text-gray-600">대출 총 기간 중에 매월 원금을 분할상환하면서 만기까지의 총 이자 금액을 미리 산출하여 원금총액에 이자 총액을 더하여 대출기간으로 나눔으로서 원금과 이자의 합계금액이 매월 일정하게 납부되도록 만든 방식입니다.</p>
-          </div>
-        </div>
-      </div>
-
       {payments.length > 0 && (
         <>
-          <div className="bg-blue-50 p-6 rounded-lg shadow mb-8">
+          <div className="bg-white p-6 rounded-lg shadow mb-8">
             <h2 className="text-xl font-bold mb-4">상환 요약</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">월 납입금</p>
-                <p className="text-lg font-bold">{formatNumber(summary.monthlyPayment)}원</p>
+              <div className="p-4 bg-gray-50 rounded">
+                <div className="text-sm text-gray-600">총 상환금액</div>
+                <div className="text-lg font-bold">{summary.totalPayment.toLocaleString()}원</div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">총 이자</p>
-                <p className="text-lg font-bold">{formatNumber(summary.totalInterest)}원</p>
+              <div className="p-4 bg-gray-50 rounded">
+                <div className="text-sm text-gray-600">총 이자금액</div>
+                <div className="text-lg font-bold">{summary.totalInterest.toLocaleString()}원</div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">총 상환금액</p>
-                <p className="text-lg font-bold">{formatNumber(summary.totalPayment)}원</p>
+              <div className="p-4 bg-gray-50 rounded">
+                <div className="text-sm text-gray-600">월 평균 상환금액</div>
+                <div className="text-lg font-bold">{summary.monthlyPayment.toLocaleString()}원</div>
               </div>
             </div>
           </div>
@@ -238,11 +214,11 @@ export default function LoanCalculator() {
               <tbody>
                 {payments.map((payment) => (
                   <tr key={payment.month} className="border-b">
-                    <td className="px-2 py-2 text-xs md:text-base md:px-4">{payment.month}회</td>
-                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{formatNumber(payment.principal)}원</td>
-                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{formatNumber(payment.interest)}원</td>
-                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{formatNumber(payment.total)}원</td>
-                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{formatNumber(payment.remainingPrincipal)}원</td>
+                    <td className="px-2 py-2 text-left text-xs md:text-base md:px-4">{payment.month}회차</td>
+                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{payment.principal.toLocaleString()}원</td>
+                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{payment.interest.toLocaleString()}원</td>
+                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{payment.total.toLocaleString()}원</td>
+                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{payment.remainingPrincipal.toLocaleString()}원</td>
                   </tr>
                 ))}
               </tbody>
@@ -250,6 +226,24 @@ export default function LoanCalculator() {
           </div>
         </>
       )}
+
+      <div className="bg-gray-50 p-6 rounded-lg shadow mt-8">
+        <h2 className="text-xl font-bold mb-4">이용안내</h2>
+        <div className="space-y-4 text-sm md:text-base">
+          <div>
+            <p className="font-semibold mb-1">만기일시상환</p>
+            <p className="text-gray-600">원금은 만기일에 일시상환하고 이자는 매월 후 이자로 납부하며, 원금은 만기일 이전이라도 전액 또는 일부 원금상환이 가능합니다.</p>
+          </div>
+          <div>
+            <p className="font-semibold mb-1">원금균등분할상환</p>
+            <p className="text-gray-600">대출원금을 대출기간으로 균등하게 나누어 매월 일정한 금액을 상환하고 이자는 매월 상환으로 줄어든 대출 잔액에 대해서만 지급하는 방식입니다.</p>
+          </div>
+          <div>
+            <p className="font-semibold mb-1">원리금균등분할상환</p>
+            <p className="text-gray-600">대출 총 기간 중에 매월 원금을 분할상환하면서 만기까지의 총 이자 금액을 미리 산출하여 원금총액에 이자 총액을 더하여 대출기간으로 나눔으로서 원금과 이자의 합계금액이 매월 일정하게 납부되도록 만든 방식입니다.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 } 
