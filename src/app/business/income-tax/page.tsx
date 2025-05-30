@@ -31,11 +31,19 @@ export default function BusinessIncomeTaxCalculator() {
   const [result, setResult] = useState<BusinessIncomeResult | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
-    setInputs(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    if (e.target instanceof HTMLInputElement) {
+      const { name, value, type, checked } = e.target;
+      setInputs(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    } else {
+      const { name, value } = e.target;
+      setInputs(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
     setResult(null);
   };
 
