@@ -17,7 +17,7 @@ const menuItems: MenuItem[] = [
     title: '재무 계산기',
     items: [
       { name: '대출 계산기', path: '/financial/loan' },
-      { name: '이자 계산기', path: '/financial/interest' },
+      { name: '단/복리 이자 계산기', path: '/financial/interest' },
     ],
   },
   {
