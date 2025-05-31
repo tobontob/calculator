@@ -25,10 +25,10 @@ export default function BMICalculator() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-md">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">체질량 지수(BMI) 계산기</h1>
       
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             키 (cm)
@@ -72,6 +72,49 @@ export default function BMICalculator() {
             </p>
           </div>
         )}
+      </div>
+
+      <div className="max-w-4xl mx-auto mt-8">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-bold mb-4">BMI 지수 정보</h2>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-blue-600 mb-2">BMI 판정 기준 (아시아-태평양 기준)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-4 rounded">
+                  <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                    <li>저체중: 18.5 미만</li>
+                    <li>정상: 18.5 - 22.9</li>
+                    <li>과체중: 23.0 - 24.9</li>
+                    <li>비만: 25.0 - 29.9</li>
+                    <li>고도비만: 30.0 이상</li>
+                  </ul>
+                </div>
+                <div className="bg-gray-50 p-4 rounded">
+                  <p className="text-gray-600">
+                    * BMI는 체중(kg)을 신장(m)의 제곱으로 나눈 값입니다.<br />
+                    * 근육량, 체지방률, 연령, 성별 등은 고려되지 않으므로 전문의와 상담하시기 바랍니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold mb-4">건강 정보 사이트</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="https://health.kdca.go.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              질병관리청 국민건강영양조사
+            </a>
+            <a href="https://www.nhis.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              국민건강보험공단
+            </a>
+            <a href="https://general.kosso.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              대한비만학회
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

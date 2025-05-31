@@ -214,6 +214,56 @@ export default function BodyFatCalculator() {
           </div>
         )}
       </div>
+
+      <div className="max-w-4xl mx-auto mt-8">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-bold mb-4">체지방률 계산기 안내</h2>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-blue-600 mb-2">체지방률이란?</h3>
+              <p className="text-gray-600 mb-4">
+                체지방률은 전체 체중에서 체지방이 차지하는 비율을 의미합니다. 체지방은 우리 몸에 필요한 에너지를 저장하고, 장기를 보호하는 등의 중요한 역할을 합니다.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-blue-600 mb-2">측정 방법 안내</h3>
+              <div className="bg-gray-50 p-4 rounded">
+                <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                  <li>목둘레: 목의 가장 가는 부위를 측정</li>
+                  <li>허리둘레: 배꼽 위치에서 수평으로 측정</li>
+                  <li>엉덩이둘레(여성): 엉덩이의 가장 돌출된 부위를 수평으로 측정</li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold text-blue-600 mb-2">주의사항</h3>
+              <div className="bg-gray-50 p-4 rounded">
+                <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                  <li>이 계산기는 미 해군 체지방 측정법을 사용합니다.</li>
+                  <li>정확한 측정을 위해 아침 공복 시에 측정하는 것이 좋습니다.</li>
+                  <li>전문적인 체성분 분석을 위해서는 의료기관이나 보건소를 방문하시기 바랍니다.</li>
+                  <li>운동선수나 근육량이 많은 경우 실제 체지방률과 차이가 있을 수 있습니다.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold mb-4">건강 정보 사이트</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="https://health.kdca.go.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              질병관리청 국민건강영양조사
+            </a>
+            <a href="https://www.nhis.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              국민건강보험공단
+            </a>
+            <a href="https://general.kosso.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              대한비만학회
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 } 

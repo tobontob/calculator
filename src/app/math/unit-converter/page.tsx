@@ -243,7 +243,7 @@ export default function UnitConverter() {
     <div className="container mx-auto px-4 py-8 max-w-md">
       <h1 className="text-3xl font-bold text-center mb-8">단위 변환기</h1>
       
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             변환 종류
@@ -337,6 +337,46 @@ export default function UnitConverter() {
             </p>
           </div>
         )}
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-bold mb-4">단위 변환기 이용 안내</h2>
+        
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-blue-600 mb-2">사용 방법</h3>
+            <ol className="list-decimal pl-5 space-y-2">
+              <li>변환하고자 하는 단위의 종류를 선택합니다 (길이, 무게, 넓이 등)</li>
+              <li>변환할 단위와 변환될 단위를 각각 선택합니다</li>
+              <li>변환하고자 하는 값을 입력합니다</li>
+              <li>'변환하기' 버튼을 클릭하면 결과가 표시됩니다</li>
+            </ol>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-blue-600 mb-2">지원하는 단위 변환</h3>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>길이: mm, cm, m, km</li>
+              <li>무게: g, kg, t</li>
+              <li>넓이: m², km², ha, 평</li>
+              <li>부피: mL, L, m³</li>
+              <li>온도: °C, °F, K</li>
+              <li>압력: Pa, atm, bar, mmHg</li>
+              <li>속도: m/s, km/h, mph</li>
+              <li>연비: km/L, L/100km, MPG</li>
+              <li>데이터량: B, KB, MB, GB, TB</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-blue-600 mb-2">주요 변환 정보</h3>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>넓이 변환: 1평 = 3.3058m²</li>
+              <li>온도 변환: °C = (°F - 32) × 5/9</li>
+              <li>데이터 단위: 1KB = 1024B, 1MB = 1024KB</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

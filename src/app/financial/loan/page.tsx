@@ -244,6 +244,76 @@ export default function LoanCalculator() {
           </div>
         </div>
       </div>
+
+      <div className="bg-white p-6 rounded-lg shadow mt-8 mb-8">
+        <h2 className="text-xl font-bold mb-4">유용한 대출 관련 사이트</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold text-blue-600 mb-3">정부/공공기관 사이트</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a href="https://www.fss.or.kr" target="_blank" rel="noopener noreferrer" 
+                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <p className="font-semibold">금융감독원</p>
+                <p className="text-sm text-gray-600">금융상품 통합 비교공시, 금융소비자 보호 정보</p>
+              </a>
+              <a href="https://www.kinfa.or.kr" target="_blank" rel="noopener noreferrer" 
+                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <p className="font-semibold">서민금융진흥원</p>
+                <p className="text-sm text-gray-600">서민대출 지원, 맞춤대출 정보 제공</p>
+              </a>
+              <a href="https://www.hf.go.kr" target="_blank" rel="noopener noreferrer" 
+                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <p className="font-semibold">한국주택금융공사</p>
+                <p className="text-sm text-gray-600">주택담보대출, 전세자금대출 정보</p>
+              </a>
+              <a href="https://www.credit.or.kr" target="_blank" rel="noopener noreferrer" 
+                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <p className="font-semibold">한국신용정보원</p>
+                <p className="text-sm text-gray-600">신용정보 조회, 신용관리 정보</p>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-blue-600 mb-3">금융기관 대출비교 사이트</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a href="https://www.bankwareglobal.com" target="_blank" rel="noopener noreferrer" 
+                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <p className="font-semibold">뱅크웨어글로벌</p>
+                <p className="text-sm text-gray-600">은행 대출상품 비교, 금리 정보</p>
+              </a>
+              <a href="https://finlife.fss.or.kr" target="_blank" rel="noopener noreferrer" 
+                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <p className="font-semibold">금융감독원 금융상품통합비교공시</p>
+                <p className="text-sm text-gray-600">금융상품 비교, 최저금리 정보</p>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-blue-600 mb-3">정책자금 지원 사이트</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a href="https://www.kosmes.or.kr" target="_blank" rel="noopener noreferrer" 
+                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <p className="font-semibold">중소벤처기업진흥공단</p>
+                <p className="text-sm text-gray-600">중소기업 정책자금 대출 정보</p>
+              </a>
+              <a href="https://www.semas.or.kr" target="_blank" rel="noopener noreferrer" 
+                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <p className="font-semibold">소상공인시장진흥공단</p>
+                <p className="text-sm text-gray-600">소상공인 지원 대출 정보</p>
+              </a>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm text-blue-800">
+              * 위 사이트들은 대출 관련 정보 제공을 위한 참고용이며, 실제 대출 신청 시에는 해당 금융기관의 상담을 받으시기 바랍니다.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 } 

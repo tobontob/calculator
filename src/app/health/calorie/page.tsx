@@ -119,6 +119,55 @@ export default function CalorieCalculator() {
           )}
         </div>
       </div>
+
+      <div className="max-w-4xl mx-auto mt-8">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-bold mb-4">칼로리 계산기 안내</h2>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-blue-600 mb-2">기초대사량(BMR)이란?</h3>
+              <p className="text-gray-600 mb-4">
+                기초대사량은 생명을 유지하는데 필요한 최소한의 에너지량으로, 심장박동, 호흡, 체온유지 등에 사용되는 열량입니다.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-blue-600 mb-2">활동량 수준 설명</h3>
+              <div className="bg-gray-50 p-4 rounded">
+                <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                  <li>거의 운동하지 않음: 사무직 등 활동량이 매우 적은 경우</li>
+                  <li>가벼운 운동: 주 1-3회 가벼운 운동을 하는 경우</li>
+                  <li>중간 강도 운동: 주 3-5회 적절한 운동을 하는 경우</li>
+                  <li>활발한 운동: 주 6-7회 강도 높은 운동을 하는 경우</li>
+                  <li>매우 활발한 운동: 하루 2회 이상 운동하거나 육체노동을 하는 경우</li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold text-blue-600 mb-2">체중 조절 시 주의사항</h3>
+              <div className="bg-gray-50 p-4 rounded">
+                <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                  <li>일반적으로 1주일에 0.5-1kg의 감량이 건강한 속도입니다.</li>
+                  <li>하루 500kcal 감소 시 일주일에 약 0.5kg 감량이 가능합니다.</li>
+                  <li>급격한 칼로리 제한은 건강에 해로울 수 있으니 전문가와 상담하세요.</li>
+                  <li>운동과 균형 잡힌 식단을 함께 병행하는 것이 좋습니다.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold mb-4">영양 및 건강 정보 사이트</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="https://www.foodsafetykorea.go.kr/main.do" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              식품안전나라
+            </a>
+            <a href="https://www.kdaedu.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              대한영양사협회
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 } 

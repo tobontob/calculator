@@ -143,6 +143,76 @@ export default function InterestCalculator() {
           )}
         </div>
       </div>
+
+      <div className="max-w-4xl mx-auto mt-8">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-bold mb-4">이자 계산기 사용법</h2>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-blue-600 mb-2">단리와 복리의 차이</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-gray-50 p-4 rounded">
+                  <p className="font-medium mb-2">단리 (Simple Interest)</p>
+                  <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                    <li>원금에 대해서만 이자가 붙는 방식</li>
+                    <li>이자에 대한 이자는 발생하지 않음</li>
+                    <li>계산식: 이자 = 원금 × 이자율 × 기간</li>
+                  </ul>
+                </div>
+                <div className="bg-gray-50 p-4 rounded">
+                  <p className="font-medium mb-2">복리 (Compound Interest)</p>
+                  <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                    <li>원금과 이자를 합한 금액에 이자가 붙는 방식</li>
+                    <li>이자에 대한 이자가 발생</li>
+                    <li>시간이 지날수록 이자가 기하급수적으로 증가</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-blue-600 mb-2">복리 계산 주기의 영향</h3>
+              <p className="text-gray-600 mb-2">복리 계산 주기가 짧을수록 최종 수령액이 늘어납니다.</p>
+              <div className="bg-gray-50 p-4 rounded">
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>연복리: 1년마다 이자를 원금에 더하여 재투자</li>
+                  <li>반기복리: 6개월마다 이자를 원금에 더하여 재투자</li>
+                  <li>분기복리: 3개월마다 이자를 원금에 더하여 재투자</li>
+                  <li>월복리: 1개월마다 이자를 원금에 더하여 재투자</li>
+                  <li>일복리: 매일 이자를 원금에 더하여 재투자</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+          <h2 className="text-xl font-bold mb-4">금융정보 사이트</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="https://www.bok.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              한국은행
+            </a>
+            <a href="https://www.fss.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              금융감독원
+            </a>
+            <a href="https://www.kinfa.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              서민금융진흥원
+            </a>
+            <a href="https://www.hf.go.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              한국주택금융공사
+            </a>
+            <a href="https://www.kcredit.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              한국신용정보원
+            </a>
+            <a href="https://www.semas.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              소상공인시장진흥공단
+            </a>
+            <a href="https://www.kosmes.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+              중소벤처기업진흥공단
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 } 
