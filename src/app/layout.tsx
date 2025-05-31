@@ -4,6 +4,7 @@ import HamburgerMenu from '@/components/layout/HamburgerMenu';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { Inter } from 'next/font/google';
+import Footer from '@/components/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -54,6 +55,7 @@ export default function RootLayout({
         <main className="pt-20">
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );
