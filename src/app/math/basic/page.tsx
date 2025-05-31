@@ -77,7 +77,7 @@ export default function BasicCalculator() {
   ];
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-md mx-auto mt-10 mb-20 p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold mb-4">기본 계산기</h1>
       <div className="mb-4">
         <input
