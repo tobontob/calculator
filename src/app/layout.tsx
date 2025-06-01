@@ -1,12 +1,32 @@
-'use client';
-
 import './globals.css';
 import HamburgerMenu from '@/components/layout/HamburgerMenu';
 import Link from 'next/link';
 import { Inter } from 'next/font/google';
 import Footer from '@/components/Footer';
+import type { Metadata } from 'next'
 
 const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: '계산기 모음',
+  description: '다양한 금융, 건강, 생활 계산기를 제공하는 웹사이트입니다.',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' }
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png' }
+    ]
+  },
+  manifest: '/site.webmanifest',
+  openGraph: {
+    title: '계산기 모음',
+    description: '다양한 금융, 건강, 생활 계산기를 제공하는 웹사이트입니다.',
+    images: '/og-image.png',
+  },
+}
 
 export default function RootLayout({
   children,
