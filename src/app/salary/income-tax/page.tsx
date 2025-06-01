@@ -110,146 +110,209 @@ export default function IncomeTaxCalculator() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8">근로소득세 계산기</h1>
       
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="space-y-6">
-          {/* 급여 정보 */}
-          <div className="border-b pb-4">
-            <h2 className="text-xl font-semibold mb-4">급여 정보</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 계산기 섹션 */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="space-y-4">
+            {/* 급여 정보 */}
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                월 급여 (원)
-              </label>
+              <label className="block text-gray-700 mb-2">월 급여 (원)</label>
               <input
                 type="number"
                 name="monthlyIncome"
                 value={inputs.monthlyIncome}
                 onChange={handleInputChange}
                 placeholder="예: 3000000"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-          </div>
 
-          {/* 공제 정보 */}
-          <div className="border-b pb-4">
-            <h2 className="text-xl font-semibold mb-4">공제 정보</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  부양가족 수 (본인 포함)
-                </label>
-                <input
-                  type="number"
-                  name="dependents"
-                  value={inputs.dependents}
-                  onChange={handleInputChange}
-                  min="1"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  나이
-                </label>
-                <input
-                  type="number"
-                  name="age"
-                  value={inputs.age}
-                  onChange={handleInputChange}
-                  placeholder="만 나이"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="isDisabled"
-                    checked={inputs.isDisabled}
-                    onChange={handleInputChange}
-                    className="form-checkbox h-4 w-4 text-blue-600"
-                  />
-                  <span className="ml-2">장애인 여부</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="is65Above"
-                    checked={inputs.is65Above}
-                    onChange={handleInputChange}
-                    className="form-checkbox h-4 w-4 text-blue-600"
-                  />
-                  <span className="ml-2">만 65세 이상</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="isSingleParent"
-                    checked={inputs.isSingleParent}
-                    onChange={handleInputChange}
-                    className="form-checkbox h-4 w-4 text-blue-600"
-                  />
-                  <span className="ml-2">한부모 가족</span>
-                </label>
-              </div>
+            {/* 공제 정보 */}
+            <div>
+              <label className="block text-gray-700 mb-2">부양가족 수 (본인 포함)</label>
+              <input
+                type="number"
+                name="dependents"
+                value={inputs.dependents}
+                onChange={handleInputChange}
+                min="1"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-          </div>
+            <div>
+              <label className="block text-gray-700 mb-2">나이</label>
+              <input
+                type="number"
+                name="age"
+                value={inputs.age}
+                onChange={handleInputChange}
+                placeholder="만 나이"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="isDisabled"
+                  checked={inputs.isDisabled}
+                  onChange={handleInputChange}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                <span className="ml-2">장애인 여부</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="is65Above"
+                  checked={inputs.is65Above}
+                  onChange={handleInputChange}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                <span className="ml-2">만 65세 이상</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="isSingleParent"
+                  checked={inputs.isSingleParent}
+                  onChange={handleInputChange}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                <span className="ml-2">한부모 가족</span>
+              </label>
+            </div>
 
-          <button
-            onClick={calculateTax}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-          >
-            계산하기
-          </button>
+            <button
+              onClick={calculateTax}
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+            >
+              계산하기
+            </button>
 
-          {result && (
-            <div className="mt-6 space-y-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-bold text-lg mb-4">세금 계산 결과 (월 기준)</h3>
-                <div className="space-y-2">
-                  <p className="flex justify-between">
-                    <span>총 급여:</span>
-                    <span className="font-semibold">{result.monthlyIncome.toLocaleString()}원</span>
-                  </p>
-                  <p className="flex justify-between">
-                    <span>과세표준:</span>
-                    <span className="font-semibold">{Math.round(result.taxableIncome).toLocaleString()}원</span>
-                  </p>
-                  <p className="flex justify-between">
-                    <span>소득세:</span>
-                    <span className="font-semibold">{Math.round(result.incomeTax).toLocaleString()}원</span>
-                  </p>
-                  <p className="flex justify-between">
-                    <span>지방소득세:</span>
-                    <span className="font-semibold">{Math.round(result.localIncomeTax).toLocaleString()}원</span>
-                  </p>
-                  <div className="border-t border-gray-300 my-2"></div>
-                  <p className="flex justify-between">
-                    <span>총 세금:</span>
-                    <span className="font-semibold text-red-600">{Math.round(result.totalTax).toLocaleString()}원</span>
-                  </p>
-                  <p className="flex justify-between font-bold text-lg">
-                    <span>실수령액:</span>
-                    <span className="text-blue-600">{Math.round(result.netIncome).toLocaleString()}원</span>
-                  </p>
+            {result && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h2 className="text-xl font-semibold mb-4">계산 결과</h2>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold mb-2">세금 내역 (월 기준)</h3>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span>총 급여:</span>
+                        <span>{result.monthlyIncome.toLocaleString()}원</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>과세표준:</span>
+                        <span>{Math.round(result.taxableIncome).toLocaleString()}원</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>소득세:</span>
+                        <span>{Math.round(result.incomeTax).toLocaleString()}원</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>지방소득세:</span>
+                        <span>{Math.round(result.localIncomeTax).toLocaleString()}원</span>
+                      </div>
+                      <div className="border-t border-gray-300 my-2"></div>
+                      <div className="flex justify-between font-semibold">
+                        <span>총 세금:</span>
+                        <span className="text-red-600">{Math.round(result.totalTax).toLocaleString()}원</span>
+                      </div>
+                      <div className="flex justify-between font-semibold">
+                        <span>실수령액:</span>
+                        <span className="text-blue-600">{Math.round(result.netIncome).toLocaleString()}원</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <div className="text-sm text-gray-600">
-                <p className="font-semibold mb-1">참고사항:</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>기본공제는 1인당 150만원이 적용됩니다.</li>
-                  <li>장애인 공제 200만원, 경로우대 공제 100만원, 한부모 공제 100만원이 적용됩니다.</li>
-                  <li>근로소득공제가 급여 수준에 따라 자동 적용됩니다.</li>
-                  <li>지방소득세는 소득세의 10%로 계산됩니다.</li>
-                  <li>실제 세금은 다양한 공제 항목에 따라 달라질 수 있습니다.</li>
+            )}
+          </div>
+        </div>
+
+        {/* 오른쪽 컬럼: 정보 및 안내 */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">소득세 안내</h2>
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded">
+                <h3 className="font-semibold text-blue-600 mb-2">기본공제</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>기본공제: 1인당 150만원</li>
+                  <li>장애인 공제: 200만원</li>
+                  <li>경로우대 공제: 100만원</li>
+                  <li>한부모 공제: 100만원</li>
+                </ul>
+              </div>
+              <div className="bg-gray-50 p-4 rounded">
+                <h3 className="font-semibold text-blue-600 mb-2">근로소득공제</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>500만원 이하: 70%</li>
+                  <li>1,500만원 이하: 40%</li>
+                  <li>4,500만원 이하: 15%</li>
+                  <li>1억원 이하: 5%</li>
+                  <li>1억원 초과: 2%</li>
+                </ul>
+              </div>
+              <div className="bg-gray-50 p-4 rounded">
+                <h3 className="font-semibold text-blue-600 mb-2">소득세율</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>1,200만원 이하: 6%</li>
+                  <li>4,600만원 이하: 15%</li>
+                  <li>8,800만원 이하: 24%</li>
+                  <li>1억 5천만원 이하: 35%</li>
+                  <li>3억원 이하: 38%</li>
+                  <li>5억원 이하: 40%</li>
+                  <li>5억원 초과: 42%</li>
                 </ul>
               </div>
             </div>
-          )}
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">관련 사이트</h2>
+            <div className="grid grid-cols-1 gap-2">
+              <a
+                href="https://www.nts.go.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">국세청</span>
+                <span className="text-gray-500 text-sm ml-2">- 근로소득세 안내</span>
+              </a>
+              <a
+                href="https://www.hometax.go.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">홈택스</span>
+                <span className="text-gray-500 text-sm ml-2">- 연말정산 서비스</span>
+              </a>
+              <a
+                href="https://www.wetax.go.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">위택스</span>
+                <span className="text-gray-500 text-sm ml-2">- 지방소득세 신고</span>
+              </a>
+              <a
+                href="https://www.moef.go.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">기획재정부</span>
+                <span className="text-gray-500 text-sm ml-2">- 세법 개정 정보</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

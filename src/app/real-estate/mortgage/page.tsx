@@ -2,191 +2,305 @@
 
 import { useState } from 'react';
 
-export default function MortgageLoanCalculator() {
-  const [propertyValue, setPropertyValue] = useState('');
+type RepaymentType = '원리금균등' | '원금균등' | '만기일시';
+
+export default function MortgageCalculator() {
   const [loanAmount, setLoanAmount] = useState('');
   const [interestRate, setInterestRate] = useState('');
   const [loanTerm, setLoanTerm] = useState('');
-  const [ltv, setLtv] = useState<number | null>(null);
-  const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
-  const [totalPayment, setTotalPayment] = useState<number | null>(null);
-  const [totalInterest, setTotalInterest] = useState<number | null>(null);
+  const [repaymentType, setRepaymentType] = useState<RepaymentType>('원리금균등');
+  const [result, setResult] = useState<{
+    monthlyPayment: number;
+    totalInterest: number;
+    totalPayment: number;
+    paymentSchedule: Array<{
+      month: number;
+      principal: number;
+      interest: number;
+      totalPayment: number;
+      remainingBalance: number;
+    }>;
+  } | null>(null);
 
-  const calculateLoan = () => {
-    // LTV 계산
-    const propertyValueNum = parseFloat(propertyValue);
-    const loanAmountNum = parseFloat(loanAmount);
-    const calculatedLtv = (loanAmountNum / propertyValueNum) * 100;
-
-    // 월 상환금 계산
-    const monthlyInterestRate = parseFloat(interestRate) / 12 / 100;
-    const numberOfPayments = parseFloat(loanTerm) * 12;
+  const calculateMortgage = () => {
+    const principal = parseFloat(loanAmount);
+    const annualRate = parseFloat(interestRate) / 100;
+    const monthlyRate = annualRate / 12;
+    const totalMonths = parseFloat(loanTerm) * 12;
     
-    const monthlyPaymentCalc = loanAmountNum * 
-      (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) /
-      (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
-
-    const totalPaymentCalc = monthlyPaymentCalc * numberOfPayments;
-    const totalInterestCalc = totalPaymentCalc - loanAmountNum;
-
-    setLtv(parseFloat(calculatedLtv.toFixed(2)));
-    setMonthlyPayment(parseFloat(monthlyPaymentCalc.toFixed(0)));
-    setTotalPayment(parseFloat(totalPaymentCalc.toFixed(0)));
-    setTotalInterest(parseFloat(totalInterestCalc.toFixed(0)));
+    let monthlyPayment = 0;
+    let totalInterest = 0;
+    let totalPayment = 0;
+    const schedule = [];
+    
+    if (repaymentType === '원리금균등') {
+      // 원리금균등상환 (Equal Monthly Installment)
+      monthlyPayment = (principal * monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) /
+                      (Math.pow(1 + monthlyRate, totalMonths) - 1);
+      
+      let remainingBalance = principal;
+      for (let month = 1; month <= totalMonths; month++) {
+        const interest = remainingBalance * monthlyRate;
+        const principalPayment = monthlyPayment - interest;
+        remainingBalance -= principalPayment;
+        
+        totalInterest += interest;
+        schedule.push({
+          month,
+          principal: principalPayment,
+          interest,
+          totalPayment: monthlyPayment,
+          remainingBalance: Math.max(0, remainingBalance)
+        });
+      }
+    } else if (repaymentType === '원금균등') {
+      // 원금균등상환 (Equal Principal Payment)
+      const monthlyPrincipal = principal / totalMonths;
+      let remainingBalance = principal;
+      
+      for (let month = 1; month <= totalMonths; month++) {
+        const interest = remainingBalance * monthlyRate;
+        remainingBalance -= monthlyPrincipal;
+        const payment = monthlyPrincipal + interest;
+        
+        totalInterest += interest;
+        schedule.push({
+          month,
+          principal: monthlyPrincipal,
+          interest,
+          totalPayment: payment,
+          remainingBalance: Math.max(0, remainingBalance)
+        });
+      }
+      monthlyPayment = schedule[0].totalPayment;
+    } else {
+      // 만기일시상환 (Bullet Payment)
+      const monthlyInterest = principal * monthlyRate;
+      monthlyPayment = monthlyInterest;
+      totalInterest = monthlyInterest * totalMonths;
+      
+      for (let month = 1; month <= totalMonths; month++) {
+        const isLastMonth = month === totalMonths;
+        schedule.push({
+          month,
+          principal: isLastMonth ? principal : 0,
+          interest: monthlyInterest,
+          totalPayment: isLastMonth ? principal + monthlyInterest : monthlyInterest,
+          remainingBalance: isLastMonth ? 0 : principal
+        });
+      }
+    }
+    
+    totalPayment = totalInterest + principal;
+    
+    setResult({
+      monthlyPayment: Math.round(monthlyPayment),
+      totalInterest: Math.round(totalInterest),
+      totalPayment: Math.round(totalPayment),
+      paymentSchedule: schedule
+    });
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8">주택담보대출 계산기</h1>
       
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            부동산 가치 (원)
-          </label>
-          <input
-            type="number"
-            value={propertyValue}
-            onChange={(e) => setPropertyValue(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="예: 300000000"
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 계산기 섹션 */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold mb-4">대출 정보 입력</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-700 mb-2">대출금액 (원)</label>
+              <input
+                type="number"
+                value={loanAmount}
+                onChange={(e) => {
+                  setLoanAmount(e.target.value);
+                  setResult(null);
+                }}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 300000000"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-2">연이자율 (%)</label>
+              <input
+                type="number"
+                value={interestRate}
+                onChange={(e) => {
+                  setInterestRate(e.target.value);
+                  setResult(null);
+                }}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 3.5"
+                step="0.1"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-2">대출기간 (년)</label>
+              <input
+                type="number"
+                value={loanTerm}
+                onChange={(e) => {
+                  setLoanTerm(e.target.value);
+                  setResult(null);
+                }}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 30"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-2">상환방식</label>
+              <select
+                value={repaymentType}
+                onChange={(e) => {
+                  setRepaymentType(e.target.value as RepaymentType);
+                  setResult(null);
+                }}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="원리금균등">원리금균등상환</option>
+                <option value="원금균등">원금균등상환</option>
+                <option value="만기일시">만기일시상환</option>
+              </select>
+            </div>
+
+            <button
+              onClick={calculateMortgage}
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+            >
+              계산하기
+            </button>
+
+            {result && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-semibold mb-2">계산 결과</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>월 납입금:</span>
+                    <span>{result.monthlyPayment.toLocaleString()}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>총 이자:</span>
+                    <span>{result.totalInterest.toLocaleString()}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>총 상환금액:</span>
+                    <span>{result.totalPayment.toLocaleString()}원</span>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <h4 className="font-semibold mb-2">상환 스케줄</h4>
+                  <div className="max-h-60 overflow-y-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="p-2 text-left">회차</th>
+                          <th className="p-2 text-right">원금</th>
+                          <th className="p-2 text-right">이자</th>
+                          <th className="p-2 text-right">잔액</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {result.paymentSchedule.map((payment, index) => (
+                          <tr key={index} className="border-b">
+                            <td className="p-2">{payment.month}회차</td>
+                            <td className="p-2 text-right">{Math.round(payment.principal).toLocaleString()}원</td>
+                            <td className="p-2 text-right">{Math.round(payment.interest).toLocaleString()}원</td>
+                            <td className="p-2 text-right">{Math.round(payment.remainingBalance).toLocaleString()}원</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            대출 금액 (원)
-          </label>
-          <input
-            type="number"
-            value={loanAmount}
-            onChange={(e) => setLoanAmount(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="예: 200000000"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            연이자율 (%)
-          </label>
-          <input
-            type="number"
-            value={interestRate}
-            onChange={(e) => setInterestRate(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="예: 3.5"
-            step="0.1"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            대출 기간 (년)
-          </label>
-          <input
-            type="number"
-            value={loanTerm}
-            onChange={(e) => setLoanTerm(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="예: 30"
-          />
-        </div>
-
-        <button
-          onClick={calculateLoan}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-        >
-          계산하기
-        </button>
-
-        {ltv !== null && (
-          <div className="mt-6 space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-bold text-lg mb-2">계산 결과</h3>
-              <div className="space-y-2">
-                <p>
-                  LTV (담보인정비율): <span className="font-semibold">{ltv}%</span>
-                </p>
-                <p>
-                  월 상환금: <span className="font-semibold">{monthlyPayment?.toLocaleString()}원</span>
-                </p>
-                <p>
-                  총 상환금액: <span className="font-semibold">{totalPayment?.toLocaleString()}원</span>
-                </p>
-                <p>
-                  총 이자금액: <span className="font-semibold">{totalInterest?.toLocaleString()}원</span>
-                </p>
+        {/* 사용법 및 정보 섹션 */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">대출 상환방식 안내</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-blue-600 mb-2">상환방식 비교</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="font-medium mb-2">원리금균등상환</p>
+                    <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                      <li>매월 동일한 금액 납부</li>
+                      <li>초기에는 이자 비중이 높음</li>
+                      <li>시간이 지날수록 원금 비중 증가</li>
+                    </ul>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="font-medium mb-2">원금균등상환</p>
+                    <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                      <li>매월 동일한 원금 상환</li>
+                      <li>이자는 잔액에 따라 감소</li>
+                      <li>초기 납입금이 가장 많음</li>
+                    </ul>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="font-medium mb-2">만기일시상환</p>
+                    <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                      <li>매월 이자만 납부</li>
+                      <li>만기에 원금 전액 상환</li>
+                      <li>총 이자 부담이 가장 큼</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div className="text-sm text-gray-600">
-              <p className="font-semibold mb-1">참고사항:</p>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>LTV 한도는 지역과 규제에 따라 40~70% 범위에서 적용됩니다.</li>
-                <li>실제 대출 가능 금액은 소득과 신용도에 따라 달라질 수 있습니다.</li>
-                <li>중도상환수수료 등 부대비용은 포함되지 않은 금액입니다.</li>
-              </ul>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold mb-4">주택담보대출 안내</h2>
-        
-        <div className="space-y-6">
-          <div>
-            <h3 className="font-semibold text-blue-600 mb-2">계산기 사용 방법</h3>
-            <ol className="list-decimal pl-5 space-y-2">
-              <li>부동산의 시세(감정가)를 입력합니다.</li>
-              <li>희망하는 대출 금액을 입력합니다.</li>
-              <li>현재 적용되는 연이자율을 입력합니다.</li>
-              <li>원하는 대출 기간(년)을 입력합니다.</li>
-              <li>'계산하기' 버튼을 클릭하면 월 상환금과 총 상환금액이 계산됩니다.</li>
-            </ol>
           </div>
 
-          <div>
-            <h3 className="font-semibold text-blue-600 mb-2">주택담보대출 관련 정보</h3>
-            <ul className="list-disc pl-5 space-y-2">
-              <li>LTV(담보인정비율)는 부동산 가치 대비 대출 가능 금액의 비율입니다.</li>
-              <li>DSR(총부채원리금상환비율)은 연소득 대비 연간 원리금 상환액의 비율입니다.</li>
-              <li>중도상환수수료는 일반적으로 3년 이내 상환 시 적용됩니다.</li>
-              <li>대출 한도는 소득, 신용도, 지역 규제 등에 따라 달라질 수 있습니다.</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-blue-600 mb-2">주택담보대출 관련 사이트</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a href="https://www.fss.or.kr" target="_blank" rel="noopener noreferrer" 
-                className="text-blue-600 hover:text-blue-800">
-                금융감독원
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">관련 정보</h2>
+            <div className="grid grid-cols-1 gap-2">
+              <a
+                href="https://www.fss.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">금융감독원</span>
+                <span className="text-gray-500 text-sm ml-2">- 대출금리 비교공시</span>
               </a>
-              <a href="https://www.hf.go.kr" target="_blank" rel="noopener noreferrer" 
-                className="text-blue-600 hover:text-blue-800">
-                한국주택금융공사
+              <a
+                href="https://www.hf.go.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">주택금융공사</span>
+                <span className="text-gray-500 text-sm ml-2">- 주택담보대출 안내</span>
               </a>
-              <a href="https://portal.kfb.or.kr/compare/loan_household_new.php" target="_blank" rel="noopener noreferrer" 
-                className="text-blue-600 hover:text-blue-800">
-                은행연합회 금리비교
+              <a
+                href="https://www.kfb.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">은행연합회</span>
+                <span className="text-gray-500 text-sm ml-2">- 대출 정보</span>
               </a>
-              <a href="https://kbland.kr" target="_blank" rel="noopener noreferrer" 
-                className="text-blue-600 hover:text-blue-800">
-                KB 부동산 시세
+              <a
+                href="https://www.banksalad.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">뱅크샐러드</span>
+                <span className="text-gray-500 text-sm ml-2">- 대출 상품 비교</span>
               </a>
             </div>
-          </div>
-
-          <div className="bg-yellow-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-yellow-800 mb-2">주의사항</h3>
-            <ul className="list-disc pl-5 space-y-1 text-yellow-700">
-              <li>계산 결과는 참고용이며, 실제 대출 조건은 금융기관과 상담이 필요합니다.</li>
-              <li>대출 심사 시 소득증빙, 신용도 평가 등 추가 심사가 진행됩니다.</li>
-              <li>금리는 변동될 수 있으며, 금융기관별로 차이가 있을 수 있습니다.</li>
-              <li>대출 시에는 중도상환수수료, 인지세 등 부대비용이 발생할 수 있습니다.</li>
-            </ul>
           </div>
         </div>
       </div>

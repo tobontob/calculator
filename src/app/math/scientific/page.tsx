@@ -133,9 +133,10 @@ export default function ScientificCalculator() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-md">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8">공학용 계산기</h1>
       
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <div className="bg-gray-100 p-4 rounded mb-4 text-right text-2xl font-mono">
           {display}
@@ -191,6 +192,74 @@ export default function ScientificCalculator() {
           <button onClick={() => handleOperator('+')} className="btn-operator">+</button>
 
           <button onClick={handleClear} className="btn-clear col-span-4">Clear</button>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">계산기 사용 안내</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-blue-600 mb-2">기본 기능</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>사칙연산: +, -, ×, ÷</li>
+                  <li>메모리 기능: MC, MR, M+, M-</li>
+                  <li>소수점 및 등호 연산</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold text-blue-600 mb-2">공학 기능</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>삼각함수: sin, cos, tan</li>
+                  <li>로그함수: log, ln</li>
+                  <li>지수/제곱: x², x³, √</li>
+                  <li>상수: π, e</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">수학/공학 관련 사이트</h2>
+            <div className="grid grid-cols-1 gap-2">
+              <a
+                href="https://www.wolfram.com/mathematica"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">Wolfram Mathematica</span>
+                <span className="text-gray-500 text-sm ml-2">- 수학 계산 도구</span>
+              </a>
+              <a
+                href="https://www.geogebra.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">GeoGebra</span>
+                <span className="text-gray-500 text-sm ml-2">- 기하학 시각화</span>
+              </a>
+              <a
+                href="https://www.desmos.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">Desmos</span>
+                <span className="text-gray-500 text-sm ml-2">- 그래프 계산기</span>
+              </a>
+              <a
+                href="https://www.mathway.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">Mathway</span>
+                <span className="text-gray-500 text-sm ml-2">- 수학 문제 해결</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 

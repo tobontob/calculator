@@ -10,282 +10,215 @@ interface StockEntry {
 }
 
 interface StockInputs {
-  entries: StockEntry[];
+  quantity: string;
+  buyPrice: string;
   currentPrice: string;
   tradingFee: string;
 }
 
 interface StockResult {
-  totalInvestment: number;
-  totalQuantity: number;
-  averagePurchasePrice: number;
-  currentValue: number;
+  totalBuyAmount: number;
+  totalCurrentAmount: number;
   totalReturn: number;
   returnRate: number;
-  tradingFees: number;
-  netReturn: number;
+  totalFee: number;
 }
 
 export default function StockCalculator() {
   const [inputs, setInputs] = useState<StockInputs>({
-    entries: [{ purchasePrice: 0, quantity: 0, date: '' }],
+    quantity: '',
+    buyPrice: '',
     currentPrice: '',
-    tradingFee: '0.015', // 기본 거래 수수료 0.015%
+    tradingFee: '0.015',
   });
 
   const [result, setResult] = useState<StockResult | null>(null);
 
-  const handleEntryChange = (index: number, field: keyof StockEntry, value: string) => {
-    const newEntries = [...inputs.entries];
-    if (field === 'date') {
-      newEntries[index] = { ...newEntries[index], [field]: value };
-    } else {
-      newEntries[index] = { ...newEntries[index], [field]: Number(value) };
-    }
-    setInputs({ ...inputs, entries: newEntries });
-  };
-
-  const addEntry = () => {
-    setInputs({
-      ...inputs,
-      entries: [...inputs.entries, { purchasePrice: 0, quantity: 0, date: '' }],
-    });
-  };
-
-  const removeEntry = (index: number) => {
-    if (inputs.entries.length > 1) {
-      const newEntries = inputs.entries.filter((_, i) => i !== index);
-      setInputs({ ...inputs, entries: newEntries });
-    }
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    setInputs((prev) => ({
+    setInputs(prev => ({
       ...prev,
-      [name]: numericValue,
+      [name]: value,
     }));
   };
 
   const calculateReturns = () => {
-    const currentPrice = Number(inputs.currentPrice) || 0;
-    const tradingFeeRate = Number(inputs.tradingFee) / 100;
+    const quantity = parseFloat(inputs.quantity) || 0;
+    const buyPrice = parseFloat(inputs.buyPrice) || 0;
+    const currentPrice = parseFloat(inputs.currentPrice) || 0;
+    const tradingFee = parseFloat(inputs.tradingFee) || 0.015;
 
-    let totalInvestment = 0;
-    let totalQuantity = 0;
-
-    // 총 투자금액과 수량 계산
-    inputs.entries.forEach((entry) => {
-      totalInvestment += entry.purchasePrice * entry.quantity;
-      totalQuantity += entry.quantity;
-    });
-
-    // 평균 매수가 계산
-    const averagePurchasePrice = totalInvestment / totalQuantity;
-
-    // 현재 평가금액
-    const currentValue = currentPrice * totalQuantity;
-
-    // 거래 수수료 계산 (매수 + 매도 수수료)
-    const tradingFees = (totalInvestment + currentValue) * tradingFeeRate;
-
-    // 총 수익금 (수수료 제외)
-    const totalReturn = currentValue - totalInvestment;
-
-    // 순수익금 (수수료 포함)
-    const netReturn = totalReturn - tradingFees;
-
-    // 수익률 계산
-    const returnRate = (netReturn / totalInvestment) * 100;
+    const totalBuyAmount = quantity * buyPrice;
+    const totalCurrentAmount = quantity * currentPrice;
+    const totalReturn = totalCurrentAmount - totalBuyAmount;
+    const returnRate = (totalReturn / totalBuyAmount) * 100;
+    const totalFee = (totalBuyAmount + totalCurrentAmount) * (tradingFee / 100);
 
     setResult({
-      totalInvestment,
-      totalQuantity,
-      averagePurchasePrice,
-      currentValue,
+      totalBuyAmount,
+      totalCurrentAmount,
       totalReturn,
       returnRate,
-      tradingFees,
-      netReturn,
+      totalFee,
     });
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <h1 className="text-2xl font-bold text-center mb-8">주식 투자수익 계산기</h1>
-        
-        {/* 입력 섹션 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">매수 정보 입력</h2>
-          
-          {/* 매수 내역 입력 */}
-          <div className="space-y-4 mb-6">
-            {inputs.entries.map((entry, index) => (
-              <div key={index} className="p-4 border rounded-lg bg-gray-50">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      매수가 (원)
-                    </label>
-                    <input
-                      type="text"
-                      value={entry.purchasePrice || ''}
-                      onChange={(e) => handleEntryChange(index, 'purchasePrice', e.target.value)}
-                      placeholder="0"
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      수량 (주)
-                    </label>
-                    <input
-                      type="text"
-                      value={entry.quantity || ''}
-                      onChange={(e) => handleEntryChange(index, 'quantity', e.target.value)}
-                      placeholder="0"
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      매수일
-                    </label>
-                    <input
-                      type="date"
-                      value={entry.date}
-                      onChange={(e) => handleEntryChange(index, 'date', e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-                {inputs.entries.length > 1 && (
-                  <button
-                    onClick={() => removeEntry(index)}
-                    className="mt-2 text-red-600 text-sm hover:text-red-700"
-                  >
-                    삭제
-                  </button>
-                )}
-              </div>
-            ))}
-            
-            <button
-              onClick={addEntry}
-              className="w-full p-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
-            >
-              + 매수 내역 추가
-            </button>
-          </div>
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('ko-KR').format(Math.round(num));
+  };
 
-          {/* 현재가 및 수수료 입력 */}
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold text-center mb-8">주식 투자수익 계산기</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 계산기 섹션 */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold mb-4">투자 정보 입력</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                현재가 (원)
-              </label>
+              <label className="block text-gray-700 mb-2">매수 수량 (주)</label>
+              <input
+                type="text"
+                name="quantity"
+                value={inputs.quantity}
+                onChange={handleInputChange}
+                placeholder="0"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">매수 단가 (원)</label>
+              <input
+                type="text"
+                name="buyPrice"
+                value={inputs.buyPrice}
+                onChange={handleInputChange}
+                placeholder="0"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">현재가 (원)</label>
               <input
                 type="text"
                 name="currentPrice"
                 value={inputs.currentPrice}
                 onChange={handleInputChange}
                 placeholder="0"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                거래 수수료율 (%)
-              </label>
+              <label className="block text-gray-700 mb-2">거래 수수료율 (%)</label>
               <input
                 type="text"
                 name="tradingFee"
                 value={inputs.tradingFee}
                 onChange={handleInputChange}
                 placeholder="0.015"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button
               onClick={calculateReturns}
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
             >
               계산하기
             </button>
+
+            {result && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-semibold mb-2">계산 결과</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>총 매수금액:</span>
+                    <span>{formatNumber(result.totalBuyAmount)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>총 평가금액:</span>
+                    <span>{formatNumber(result.totalCurrentAmount)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>총 수익금:</span>
+                    <span className={`${result.totalReturn >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                      {formatNumber(result.totalReturn)}원
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>수익률:</span>
+                    <span className={`${result.returnRate >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                      {result.returnRate.toFixed(2)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>거래 수수료:</span>
+                    <span className="text-red-600">{formatNumber(result.totalFee)}원</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* 결과 섹션 */}
-        {result && (
+        {/* 사용법 및 정보 섹션 */}
+        <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">투자 수익 분석</h2>
+            <h2 className="text-xl font-bold mb-4">주식 투자 안내</h2>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600">총 투자금액</p>
-                  <p className="text-lg font-semibold">
-                    {formatNumber(result.totalInvestment)}원
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">총 보유수량</p>
-                  <p className="text-lg font-semibold">
-                    {formatNumber(result.totalQuantity)}주
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">평균 매수가</p>
-                  <p className="text-lg font-semibold">
-                    {formatNumber(result.averagePurchasePrice)}원
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">현재 평가금액</p>
-                  <p className="text-lg font-semibold">
-                    {formatNumber(result.currentValue)}원
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">총 수수료</p>
-                  <p className="text-lg font-semibold text-red-600">
-                    {formatNumber(result.tradingFees)}원
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">순수익률</p>
-                  <p className={`text-lg font-semibold ${
-                    result.returnRate > 0 ? 'text-red-600' : 
-                    result.returnRate < 0 ? 'text-blue-600' : 'text-gray-600'
-                  }`}>
-                    {result.returnRate.toFixed(2)}%
-                  </p>
-                </div>
+              <div>
+                <h3 className="font-semibold text-blue-600 mb-2">투자 비용</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>매매 수수료: 거래 금액의 0.015~0.35%</li>
+                  <li>증권거래세: 매도 시 0.23%</li>
+                  <li>농어촌특별세: 매도 시 0.15%</li>
+                  <li>양도소득세: 대주주는 별도 과세</li>
+                </ul>
               </div>
-              <div className="border-t pt-4 mt-4">
-                <p className="text-sm text-gray-600">순수익금 (수수료 차감 후)</p>
-                <p className={`text-xl font-bold ${
-                  result.netReturn > 0 ? 'text-red-600' : 
-                  result.netReturn < 0 ? 'text-blue-600' : 'text-gray-600'
-                }`}>
-                  {formatNumber(result.netReturn)}원
-                </p>
+              <div>
+                <h3 className="font-semibold text-blue-600 mb-2">투자 유의사항</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>투자는 원금 손실의 위험이 있음</li>
+                  <li>분산 투자로 리스크 관리 필요</li>
+                  <li>기업의 재무상태 확인 중요</li>
+                  <li>시장 상황에 따른 변동성 고려</li>
+                </ul>
               </div>
             </div>
           </div>
-        )}
 
-        {/* 참고 사항 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mt-8">
-          <h2 className="text-xl font-semibold mb-4">참고 사항</h2>
-          <ul className="list-disc list-inside space-y-2 text-sm text-gray-600">
-            <li>거래 수수료는 매수, 매도 시 각각 적용됩니다.</li>
-            <li>기본 거래 수수료율은 0.015%로 설정되어 있습니다.</li>
-            <li>증권사별로 실제 거래 수수료는 다를 수 있습니다.</li>
-            <li>세금 관련 사항(양도소득세 등)은 포함되어 있지 않습니다.</li>
-            <li>투자 손익은 실현된 것이 아닌 현재가 기준 평가금액입니다.</li>
-          </ul>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">관련 정보</h2>
+            <div className="grid grid-cols-1 gap-2">
+              <a
+                href="https://www.krx.co.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">한국거래소</span>
+                <span className="text-gray-500 text-sm ml-2">- 주식시장 정보</span>
+              </a>
+              <a
+                href="https://www.ksd.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">예탁결제원</span>
+                <span className="text-gray-500 text-sm ml-2">- 증권정보 포털</span>
+              </a>
+              <a
+                href="https://www.fss.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">금융감독원</span>
+                <span className="text-gray-500 text-sm ml-2">- 전자공시</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -112,187 +112,170 @@ export default function FundCalculator() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <h1 className="text-2xl font-bold text-center mb-8">펀드 수익률 계산기</h1>
-        
-        {/* 입력 섹션 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">투자 정보 입력</h2>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold text-center mb-8">펀드 수익률 계산기</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 계산기 섹션 */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold mb-4">투자 정보 입력</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                초기 투자금액
-              </label>
+              <label className="block text-gray-700 mb-2">초기 투자금액</label>
               <input
                 type="text"
                 name="initialInvestment"
                 value={inputs.initialInvestment}
                 onChange={handleInputChange}
                 placeholder="0"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                월 적립금액
-              </label>
+              <label className="block text-gray-700 mb-2">월 적립금액</label>
               <input
                 type="text"
                 name="monthlyInvestment"
                 value={inputs.monthlyInvestment}
                 onChange={handleInputChange}
                 placeholder="0"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                투자 기간 (년)
-              </label>
+              <label className="block text-gray-700 mb-2">투자 기간 (년)</label>
               <input
                 type="text"
                 name="investmentPeriod"
                 value={inputs.investmentPeriod}
                 onChange={handleInputChange}
                 placeholder="1"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                예상 수익률 (연 %)
-              </label>
+              <label className="block text-gray-700 mb-2">예상 수익률 (연 %)</label>
               <input
                 type="text"
                 name="expectedReturn"
                 value={inputs.expectedReturn}
                 onChange={handleInputChange}
                 placeholder="0"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                펀드 보수 (연 %)
-              </label>
+              <label className="block text-gray-700 mb-2">펀드 보수 (연 %)</label>
               <input
                 type="text"
                 name="managementFee"
                 value={inputs.managementFee}
                 onChange={handleInputChange}
                 placeholder="1.5"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                판매 수수료 (연 %)
-              </label>
+              <label className="block text-gray-700 mb-2">판매 수수료 (연 %)</label>
               <input
                 type="text"
                 name="salesFee"
                 value={inputs.salesFee}
                 onChange={handleInputChange}
                 placeholder="0.5"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button
               onClick={calculateFundReturns}
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
             >
               계산하기
             </button>
+
+            {result && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-semibold mb-2">계산 결과</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>총 투자금액:</span>
+                    <span>{formatNumber(result.totalInvestment)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>예상 수익금:</span>
+                    <span className="text-blue-600">{formatNumber(result.totalReturn)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>최종 평가금액:</span>
+                    <span>{formatNumber(result.netReturn)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>연평균 수익률:</span>
+                    <span className="text-blue-600">{result.effectiveReturnRate.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* 결과 섹션 */}
-        {result && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">투자 수익 분석</h2>
+        {/* 사용법 및 정보 섹션 */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">펀드 투자 안내</h2>
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600">총 투자금액</p>
-                <p className="text-lg font-semibold">
-                  {formatNumber(result.totalInvestment)}원
-                </p>
+                <h3 className="font-semibold text-blue-600 mb-2">펀드 비용 구조</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>펀드 보수: 펀드 운용에 필요한 비용</li>
+                  <li>판매 수수료: 펀드 판매 시 발생하는 수수료</li>
+                  <li>기타 비용: 펀드 운용 과정에서 발생하는 부수적인 비용</li>
+                </ul>
               </div>
               <div>
-                <p className="text-sm text-gray-600">총 수익금</p>
-                <p className="text-lg font-semibold text-blue-600">
-                  {formatNumber(result.totalReturn)}원
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">총 수수료</p>
-                <p className="text-lg font-semibold text-red-600">
-                  {formatNumber(result.totalFees)}원
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">최종 평가금액</p>
-                <p className="text-lg font-semibold">
-                  {formatNumber(result.netReturn)}원
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">실질 수익률</p>
-                <p className="text-lg font-semibold">
-                  {result.effectiveReturnRate.toFixed(2)}%
-                </p>
-              </div>
-
-              {/* 연도별 상세 내역 */}
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">연도별 상세 내역</h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="px-4 py-2 text-left">연차</th>
-                        <th className="px-4 py-2 text-right">투자금</th>
-                        <th className="px-4 py-2 text-right">수익금</th>
-                        <th className="px-4 py-2 text-right">수수료</th>
-                        <th className="px-4 py-2 text-right">평가금액</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {result.yearlyBreakdown.map((year) => (
-                        <tr key={year.year} className="border-t">
-                          <td className="px-4 py-2">{year.year}년차</td>
-                          <td className="px-4 py-2 text-right">
-                            {formatNumber(year.investment)}원
-                          </td>
-                          <td className="px-4 py-2 text-right text-blue-600">
-                            {formatNumber(year.returns)}원
-                          </td>
-                          <td className="px-4 py-2 text-right text-red-600">
-                            {formatNumber(year.fees)}원
-                          </td>
-                          <td className="px-4 py-2 text-right font-semibold">
-                            {formatNumber(year.balance)}원
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <h3 className="font-semibold text-blue-600 mb-2">투자 시 고려사항</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>투자 목적과 기간에 맞는 펀드 선택</li>
+                  <li>위험과 수익률의 상관관계 이해</li>
+                  <li>분산 투자를 통한 리스크 관리</li>
+                  <li>정기적인 포트폴리오 리밸런싱</li>
+                </ul>
               </div>
             </div>
           </div>
-        )}
 
-        {/* 참고 사항 */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">참고 사항</h2>
-          <ul className="list-disc list-inside space-y-2 text-sm text-gray-600">
-            <li>이 계산기는 예상 수익률을 기반으로 한 시뮬레이션입니다.</li>
-            <li>실제 펀드 수익률은 시장 상황에 따라 변동될 수 있습니다.</li>
-            <li>펀드 보수와 판매 수수료는 펀드 종류에 따라 다를 수 있습니다.</li>
-            <li>세금 관련 사항은 포함되어 있지 않습니다.</li>
-            <li>복리 효과가 반영된 결과입니다.</li>
-          </ul>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">관련 정보</h2>
+            <div className="grid grid-cols-1 gap-2">
+              <a
+                href="https://www.kofia.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">금융투자협회</span>
+                <span className="text-gray-500 text-sm ml-2">- 펀드 공시 정보</span>
+              </a>
+              <a
+                href="https://dis.kofia.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">펀드 정보 One-Click</span>
+                <span className="text-gray-500 text-sm ml-2">- 펀드 검색</span>
+              </a>
+              <a
+                href="https://www.fss.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">금융감독원</span>
+                <span className="text-gray-500 text-sm ml-2">- 금융상품 비교</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

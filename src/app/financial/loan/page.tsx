@@ -116,91 +116,153 @@ export default function LoanCalculator() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8">대출 계산기</h1>
       
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              대출금액 (원)
-            </label>
-            <input
-              type="number"
-              value={principal}
-              onChange={(e) => setPrincipal(e.target.value)}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="대출금액을 입력하세요"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              연이자율 (%)
-            </label>
-            <input
-              type="number"
-              value={interestRate}
-              onChange={(e) => setInterestRate(e.target.value)}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="연이자율을 입력하세요"
-              step="0.1"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              대출기간 (개월)
-            </label>
-            <input
-              type="number"
-              value={loanTerm}
-              onChange={(e) => setLoanTerm(e.target.value)}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="대출기간을 입력하세요"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              상환방식
-            </label>
-            <select
-              value={paymentType}
-              onChange={(e) => setPaymentType(e.target.value)}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 계산기 섹션 */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-700 mb-2">대출금액 (원)</label>
+              <input
+                type="number"
+                value={principal}
+                onChange={(e) => setPrincipal(e.target.value)}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="대출금액을 입력하세요"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">연이자율 (%)</label>
+              <input
+                type="number"
+                value={interestRate}
+                onChange={(e) => setInterestRate(e.target.value)}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="연이자율을 입력하세요"
+                step="0.1"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">대출기간 (년)</label>
+              <input
+                type="number"
+                value={loanTerm}
+                onChange={(e) => setLoanTerm(e.target.value)}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="대출기간을 입력하세요"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 mb-2">상환방식</label>
+              <select
+                value={paymentType}
+                onChange={(e) => setPaymentType(e.target.value)}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="bullet">만기일시상환</option>
+                <option value="equal-principal">원금균등분할상환</option>
+                <option value="equal-payment">원리금균등분할상환</option>
+              </select>
+            </div>
+
+            <button
+              onClick={calculateLoan}
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
             >
-              <option value="bullet">만기일시상환</option>
-              <option value="equal-principal">원금균등분할상환</option>
-              <option value="equal-payment">원리금균등분할상환</option>
-            </select>
+              계산하기
+            </button>
+
+            {payments.length > 0 && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h2 className="text-xl font-semibold mb-4">계산 결과</h2>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold mb-2">상환 요약</h3>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span>총 상환금액:</span>
+                        <span>{summary.totalPayment.toLocaleString()}원</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>총 이자금액:</span>
+                        <span>{summary.totalInterest.toLocaleString()}원</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>월 평균 상환금액:</span>
+                        <span>{summary.monthlyPayment.toLocaleString()}원</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        <button
-          onClick={calculateLoan}
-          className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition-colors"
-        >
-          계산하기
-        </button>
-      </div>
-
-      {payments.length > 0 && (
-        <>
-          <div className="bg-white p-6 rounded-lg shadow mb-8">
-            <h2 className="text-xl font-bold mb-4">상환 요약</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">총 상환금액</div>
-                <div className="text-lg font-bold">{summary.totalPayment.toLocaleString()}원</div>
+        {/* 오른쪽 컬럼: 정보 및 결과 */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">대출 상환 방식 안내</h2>
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded">
+                <h3 className="font-semibold text-blue-600 mb-2">만기일시상환</h3>
+                <p className="text-gray-600">
+                  원금은 만기일에 일시상환하고 이자는 매월 후 이자로 납부하며, 원금은 만기일 이전이라도 전액 또는 일부 원금상환이 가능합니다.
+                </p>
               </div>
-              <div className="p-4 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">총 이자금액</div>
-                <div className="text-lg font-bold">{summary.totalInterest.toLocaleString()}원</div>
+              <div className="bg-gray-50 p-4 rounded">
+                <h3 className="font-semibold text-blue-600 mb-2">원금균등분할상환</h3>
+                <p className="text-gray-600">
+                  대출원금을 대출기간으로 균등하게 나누어 매월 일정한 금액을 상환하고 이자는 매월 상환으로 줄어든 대출 잔액에 대해서만 지급하는 방식입니다.
+                </p>
               </div>
-              <div className="p-4 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">월 평균 상환금액</div>
-                <div className="text-lg font-bold">{summary.monthlyPayment.toLocaleString()}원</div>
+              <div className="bg-gray-50 p-4 rounded">
+                <h3 className="font-semibold text-blue-600 mb-2">원리금균등분할상환</h3>
+                <p className="text-gray-600">
+                  대출 총 기간 중에 매월 원금을 분할상환하면서 만기까지의 총 이자 금액을 미리 산출하여 원금총액에 이자 총액을 더하여 대출기간으로 나눔으로서 원금과 이자의 합계금액이 매월 일정하게 납부되도록 만든 방식입니다.
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow overflow-x-auto">
-            <h2 className="text-xl font-bold mb-4">상환 스케줄</h2>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">유용한 대출 관련 사이트</h2>
+            <div className="grid grid-cols-1 gap-2">
+              <a
+                href="https://www.fss.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">금융감독원</span>
+                <span className="text-gray-500 text-sm ml-2">- 대출 금리 비교 정보</span>
+              </a>
+              <a
+                href="https://www.kinfa.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">서민금융진흥원</span>
+                <span className="text-gray-500 text-sm ml-2">- 서민대출 지원 정보</span>
+              </a>
+              <a
+                href="https://www.kfb.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">은행연합회</span>
+                <span className="text-gray-500 text-sm ml-2">- 대출 상품 비교</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {payments.length > 0 && (
+        <div className="bg-white p-6 rounded-lg shadow-md mt-8">
+          <h2 className="text-xl font-bold mb-4">상환 스케줄</h2>
+          <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
                 <tr className="bg-gray-50">
@@ -224,96 +286,8 @@ export default function LoanCalculator() {
               </tbody>
             </table>
           </div>
-        </>
+        </div>
       )}
-
-      <div className="bg-gray-50 p-6 rounded-lg shadow mt-8">
-        <h2 className="text-xl font-bold mb-4">이용안내</h2>
-        <div className="space-y-4 text-sm md:text-base">
-          <div>
-            <p className="font-semibold mb-1">만기일시상환</p>
-            <p className="text-gray-600">원금은 만기일에 일시상환하고 이자는 매월 후 이자로 납부하며, 원금은 만기일 이전이라도 전액 또는 일부 원금상환이 가능합니다.</p>
-          </div>
-          <div>
-            <p className="font-semibold mb-1">원금균등분할상환</p>
-            <p className="text-gray-600">대출원금을 대출기간으로 균등하게 나누어 매월 일정한 금액을 상환하고 이자는 매월 상환으로 줄어든 대출 잔액에 대해서만 지급하는 방식입니다.</p>
-          </div>
-          <div>
-            <p className="font-semibold mb-1">원리금균등분할상환</p>
-            <p className="text-gray-600">대출 총 기간 중에 매월 원금을 분할상환하면서 만기까지의 총 이자 금액을 미리 산출하여 원금총액에 이자 총액을 더하여 대출기간으로 나눔으로서 원금과 이자의 합계금액이 매월 일정하게 납부되도록 만든 방식입니다.</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow mt-8 mb-8">
-        <h2 className="text-xl font-bold mb-4">유용한 대출 관련 사이트</h2>
-        
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-blue-600 mb-3">정부/공공기관 사이트</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a href="https://www.fss.or.kr" target="_blank" rel="noopener noreferrer" 
-                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <p className="font-semibold">금융감독원</p>
-                <p className="text-sm text-gray-600">금융상품 통합 비교공시, 금융소비자 보호 정보</p>
-              </a>
-              <a href="https://www.kinfa.or.kr" target="_blank" rel="noopener noreferrer" 
-                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <p className="font-semibold">서민금융진흥원</p>
-                <p className="text-sm text-gray-600">서민대출 지원, 맞춤대출 정보 제공</p>
-              </a>
-              <a href="https://www.hf.go.kr" target="_blank" rel="noopener noreferrer" 
-                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <p className="font-semibold">한국주택금융공사</p>
-                <p className="text-sm text-gray-600">주택담보대출, 전세자금대출 정보</p>
-              </a>
-              <a href="https://www.credit.or.kr" target="_blank" rel="noopener noreferrer" 
-                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <p className="font-semibold">한국신용정보원</p>
-                <p className="text-sm text-gray-600">신용정보 조회, 신용관리 정보</p>
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-blue-600 mb-3">금융기관 대출비교 사이트</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a href="https://www.bankwareglobal.com" target="_blank" rel="noopener noreferrer" 
-                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <p className="font-semibold">뱅크웨어글로벌</p>
-                <p className="text-sm text-gray-600">은행 대출상품 비교, 금리 정보</p>
-              </a>
-              <a href="https://finlife.fss.or.kr" target="_blank" rel="noopener noreferrer" 
-                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <p className="font-semibold">금융감독원 금융상품통합비교공시</p>
-                <p className="text-sm text-gray-600">금융상품 비교, 최저금리 정보</p>
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-blue-600 mb-3">정책자금 지원 사이트</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a href="https://www.kosmes.or.kr" target="_blank" rel="noopener noreferrer" 
-                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <p className="font-semibold">중소벤처기업진흥공단</p>
-                <p className="text-sm text-gray-600">중소기업 정책자금 대출 정보</p>
-              </a>
-              <a href="https://www.semas.or.kr" target="_blank" rel="noopener noreferrer" 
-                className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <p className="font-semibold">소상공인시장진흥공단</p>
-                <p className="text-sm text-gray-600">소상공인 지원 대출 정보</p>
-              </a>
-            </div>
-          </div>
-
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <p className="text-sm text-blue-800">
-              * 위 사이트들은 대출 관련 정보 제공을 위한 참고용이며, 실제 대출 신청 시에는 해당 금융기관의 상담을 받으시기 바랍니다.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 } 

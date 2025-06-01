@@ -240,10 +240,11 @@ export default function UnitConverter() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-md">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8">단위 변환기</h1>
       
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow-md p-6">
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             변환 종류
@@ -339,6 +340,7 @@ export default function UnitConverter() {
         )}
       </div>
 
+        <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-bold mb-4">단위 변환기 이용 안내</h2>
         
@@ -375,6 +377,51 @@ export default function UnitConverter() {
               <li>온도 변환: °C = (°F - 32) × 5/9</li>
               <li>데이터 단위: 1KB = 1024B, 1MB = 1024KB</li>
             </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* 관련 사이트 링크 섹션 */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">단위 변환 관련 사이트</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a
+                href="https://www.nist.gov/pml/weights-and-measures"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">NIST</span>
+                <span className="text-gray-500 text-sm ml-2">- 국제 표준 단위</span>
+              </a>
+              <a
+                href="https://www.bipm.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">BIPM</span>
+                <span className="text-gray-500 text-sm ml-2">- 국제도량형국</span>
+              </a>
+              <a
+                href="https://www.ktc.re.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">한국기술표준원</span>
+                <span className="text-gray-500 text-sm ml-2">- 국가표준</span>
+              </a>
+              <a
+                href="https://www.kriss.re.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">한국표준과학연구원</span>
+                <span className="text-gray-500 text-sm ml-2">- 측정표준</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

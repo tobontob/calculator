@@ -120,121 +120,184 @@ export default function PropertyTaxCalculator() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8">종합부동산세 계산기</h1>
       
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            부동산 유형
-          </label>
-          <select
-            value={propertyType}
-            onChange={(e) => {
-              setPropertyType(e.target.value as PropertyType);
-              setResult(null);
-            }}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          >
-            <option value="주택">주택</option>
-            <option value="종합합산토지">종합합산토지</option>
-            <option value="별도합산토지">별도합산토지</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            부동산 공시가격 총액 (원)
-          </label>
-          <input
-            type="number"
-            value={totalValue}
-            onChange={(e) => {
-              setTotalValue(e.target.value);
-              setResult(null);
-            }}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="예: 1500000000"
-          />
-        </div>
-
-        {propertyType === '주택' && (
-          <>
-            <div className="mb-4">
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={isMultipleHouse}
-                  onChange={(e) => {
-                    setIsMultipleHouse(e.target.checked);
-                    setResult(null);
-                  }}
-                  className="form-checkbox h-4 w-4 text-blue-600"
-                />
-                <span className="ml-2">다주택자 여부</span>
-              </label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 계산기 섹션 */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold mb-4">과세 정보 입력</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-700 mb-2">부동산 유형</label>
+              <select
+                value={propertyType}
+                onChange={(e) => {
+                  setPropertyType(e.target.value as PropertyType);
+                  setResult(null);
+                }}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="주택">주택</option>
+                <option value="종합합산토지">종합합산토지</option>
+                <option value="별도합산토지">별도합산토지</option>
+              </select>
             </div>
 
-            <div className="mb-6">
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={isFirstHome}
-                  onChange={(e) => {
-                    setIsFirstHome(e.target.checked);
-                    setResult(null);
-                  }}
-                  className="form-checkbox h-4 w-4 text-blue-600"
-                />
-                <span className="ml-2">1세대 1주택 여부</span>
-              </label>
+            <div>
+              <label className="block text-gray-700 mb-2">부동산 공시가격 총액 (원)</label>
+              <input
+                type="number"
+                value={totalValue}
+                onChange={(e) => {
+                  setTotalValue(e.target.value);
+                  setResult(null);
+                }}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 1500000000"
+              />
             </div>
-          </>
-        )}
 
-        <button
-          onClick={calculateTax}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-        >
-          계산하기
-        </button>
+            {propertyType === '주택' && (
+              <div>
+                <label className="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={isMultipleHouse}
+                    onChange={(e) => {
+                      setIsMultipleHouse(e.target.checked);
+                      setResult(null);
+                    }}
+                    className="form-checkbox h-4 w-4 text-blue-600"
+                  />
+                  <span className="ml-2">다주택자 여부</span>
+                </label>
+              </div>
+            )}
 
-        {result && (
-          <div className="mt-6 space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-bold text-lg mb-4">세금 계산 결과</h3>
-              <div className="space-y-2">
-                <p className="flex justify-between">
-                  <span>과세표준액:</span>
-                  <span className="font-semibold">{result.taxBase.toLocaleString()}원</span>
-                </p>
-                <p className="flex justify-between">
-                  <span>종합부동산세:</span>
-                  <span className="font-semibold">{result.propertyTax.toLocaleString()}원</span>
-                </p>
-                <p className="flex justify-between">
-                  <span>지방교육세:</span>
-                  <span className="font-semibold">{result.localEducationTax.toLocaleString()}원</span>
-                </p>
-                <div className="border-t border-gray-300 my-2"></div>
-                <p className="flex justify-between font-bold text-lg">
-                  <span>총 세금:</span>
-                  <span className="text-blue-600">{result.totalTax.toLocaleString()}원</span>
-                </p>
+            {propertyType === '주택' && (
+              <div>
+                <label className="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={isFirstHome}
+                    onChange={(e) => {
+                      setIsFirstHome(e.target.checked);
+                      setResult(null);
+                    }}
+                    className="form-checkbox h-4 w-4 text-blue-600"
+                  />
+                  <span className="ml-2">1세대 1주택자</span>
+                </label>
+              </div>
+            )}
+
+            <button
+              onClick={calculateTax}
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+            >
+              계산하기
+            </button>
+
+            {result && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-semibold mb-2">계산 결과</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>과세표준액:</span>
+                    <span>{result.taxBase.toLocaleString()}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>종합부동산세:</span>
+                    <span>{result.propertyTax.toLocaleString()}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>지방교육세:</span>
+                    <span>{result.localEducationTax.toLocaleString()}원</span>
+                  </div>
+                  <div className="border-t border-gray-300 my-2"></div>
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>총 세금:</span>
+                    <span className="text-blue-600">{result.totalTax.toLocaleString()}원</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 사용법 및 정보 섹션 */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">종합부동산세 안내</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-blue-600 mb-2">과세 대상</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="font-medium mb-2">주택</p>
+                    <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                      <li>과세기준: 11억원 초과</li>
+                      <li>1세대 1주택: 세율 0.5~3.0%</li>
+                      <li>다주택자: 세율 0.6~3.6%</li>
+                      <li>1세대 1주택 20% 감면</li>
+                    </ul>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="font-medium mb-2">토지</p>
+                    <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                      <li>종합합산: 15억원 초과 (1~3%)</li>
+                      <li>별도합산: 20억원 초과 (0.5~1.5%)</li>
+                      <li>분리과세: 과세 제외</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div className="text-sm text-gray-600">
-              <p className="font-semibold mb-1">참고사항:</p>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>공정시장가액비율 95%가 적용됩니다.</li>
-                <li>주택의 경우 11억원, 종합합산토지는 15억원, 별도합산토지는 20억원 공제됩니다.</li>
-                <li>1세대 1주택자는 종합부동산세 20% 감면 혜택이 적용됩니다.</li>
-                <li>정확한 세금은 관할 세무서나 전문가와 상담하시기 바랍니다.</li>
-              </ul>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">관련 정보</h2>
+            <div className="grid grid-cols-1 gap-2">
+              <a
+                href="https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2227&cntntsId=7697"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">국세청</span>
+                <span className="text-gray-500 text-sm ml-2">- 종합부동산세 안내</span>
+              </a>
+              <a
+                href="https://www.wetax.go.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">위택스</span>
+                <span className="text-gray-500 text-sm ml-2">- 세금 조회/납부</span>
+              </a>
+              <a
+                href="https://www.realtyprice.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">부동산공시가격알리미</span>
+                <span className="text-gray-500 text-sm ml-2">- 공시가격 조회</span>
+              </a>
+              <a
+                href="https://www.molit.go.kr/portal.do"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">국토교통부</span>
+                <span className="text-gray-500 text-sm ml-2">- 부동산 정책 정보</span>
+              </a>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

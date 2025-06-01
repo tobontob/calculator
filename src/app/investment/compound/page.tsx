@@ -134,184 +134,138 @@ export default function CompoundCalculator() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <h1 className="text-2xl font-bold text-center mb-8">복리 수익률 계산기</h1>
-        
-        {/* 입력 섹션 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">투자 정보 입력</h2>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold text-center mb-8">복리 수익률 계산기</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 계산기 섹션 */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold mb-4">투자 정보 입력</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                초기 투자금액 (원)
-              </label>
+              <label className="block text-gray-700 mb-2">초기 투자금액 (원)</label>
               <input
                 type="text"
                 name="initialInvestment"
                 value={inputs.initialInvestment}
                 onChange={handleInputChange}
                 placeholder="0"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                연간 수익률 (%)
-              </label>
+              <label className="block text-gray-700 mb-2">연간 수익률 (%)</label>
               <input
                 type="text"
                 name="annualReturn"
                 value={inputs.annualReturn}
                 onChange={handleInputChange}
                 placeholder="0"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                투자 기간 (년)
-              </label>
+              <label className="block text-gray-700 mb-2">투자 기간 (년)</label>
               <input
                 type="text"
                 name="investmentPeriod"
                 value={inputs.investmentPeriod}
                 onChange={handleInputChange}
                 placeholder="1"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                복리 계산 주기
-              </label>
-              <select
-                name="compoundingFrequency"
-                value={inputs.compoundingFrequency}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="annually">연복리</option>
-                <option value="quarterly">분기복리</option>
-                <option value="monthly">월복리</option>
-                <option value="daily">일복리</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                추가 투자금액 (원)
-              </label>
-              <input
-                type="text"
-                name="additionalInvestment"
-                value={inputs.additionalInvestment}
-                onChange={handleInputChange}
-                placeholder="0"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                추가 투자 주기
-              </label>
-              <select
-                name="additionalFrequency"
-                value={inputs.additionalFrequency}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="monthly">매월</option>
-                <option value="quarterly">매분기</option>
-                <option value="annually">매년</option>
-              </select>
             </div>
             <button
               onClick={calculateCompoundInterest}
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
             >
               계산하기
             </button>
+
+            {result && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-semibold mb-2">계산 결과</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>총 투자금액:</span>
+                    <span>{formatNumber(result.totalInvestment)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>총 수익금:</span>
+                    <span className="text-blue-600">{formatNumber(result.totalReturn)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>최종 평가금액:</span>
+                    <span>{formatNumber(result.finalAmount)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>총 수익률:</span>
+                    <span className="text-blue-600">{result.returnRate.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* 결과 섹션 */}
-        {result && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">투자 수익 분석</h2>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600">총 투자금액</p>
-                  <p className="text-lg font-semibold">
-                    {formatNumber(result.totalInvestment)}원
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">최종 평가금액</p>
-                  <p className="text-lg font-semibold">
-                    {formatNumber(result.finalAmount)}원
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">총 수익금</p>
-                  <p className="text-lg font-semibold text-blue-600">
-                    {formatNumber(result.totalReturn)}원
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">총 수익률</p>
-                  <p className="text-lg font-semibold text-blue-600">
-                    {result.returnRate.toFixed(2)}%
-                  </p>
-                </div>
-              </div>
-
-              {/* 연도별 상세 내역 */}
+        {/* 사용법 및 정보 섹션 */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">복리 수익률 안내</h2>
+            <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold mb-2">연도별 상세 내역</h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="px-4 py-2 text-left">연차</th>
-                        <th className="px-4 py-2 text-right">추가 투자금</th>
-                        <th className="px-4 py-2 text-right">수익금</th>
-                        <th className="px-4 py-2 text-right">평가금액</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {result.yearlyBreakdown.map((year) => (
-                        <tr key={year.year} className="border-t">
-                          <td className="px-4 py-2">{year.year}년차</td>
-                          <td className="px-4 py-2 text-right">
-                            {formatNumber(year.investment)}원
-                          </td>
-                          <td className="px-4 py-2 text-right text-blue-600">
-                            {formatNumber(year.returns)}원
-                          </td>
-                          <td className="px-4 py-2 text-right font-semibold">
-                            {formatNumber(year.balance)}원
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <h3 className="font-semibold text-blue-600 mb-2">복리의 이해</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>원금에 대한 이자가 발생</li>
+                  <li>발생한 이자에 대해서도 이자가 발생</li>
+                  <li>시간이 지날수록 수익이 기하급수적으로 증가</li>
+                  <li>장기 투자일수록 복리 효과가 커짐</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold text-blue-600 mb-2">투자 전략</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  <li>장기 투자를 통한 복리 효과 극대화</li>
+                  <li>정기적인 재투자로 수익 창출</li>
+                  <li>분산 투자로 리스크 관리</li>
+                  <li>투자 비용 최소화</li>
+                </ul>
               </div>
             </div>
           </div>
-        )}
 
-        {/* 참고 사항 */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">참고 사항</h2>
-          <ul className="list-disc list-inside space-y-2 text-sm text-gray-600">
-            <li>복리는 이자에 이자가 붙는 효과를 계산에 반영합니다.</li>
-            <li>연복리는 1년에 한 번, 월복리는 매월, 일복리는 매일 복리 효과가 적용됩니다.</li>
-            <li>추가 투자금은 선택한 주기에 따라 정기적으로 투자되는 것으로 계산됩니다.</li>
-            <li>실제 투자 수익은 시장 상황에 따라 달라질 수 있습니다.</li>
-            <li>세금과 수수료는 계산에 포함되지 않았습니다.</li>
-          </ul>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">관련 정보</h2>
+            <div className="grid grid-cols-1 gap-2">
+              <a
+                href="https://www.fss.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">금융감독원</span>
+                <span className="text-gray-500 text-sm ml-2">- 금융상품 정보</span>
+              </a>
+              <a
+                href="https://www.ksd.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">예탁결제원</span>
+                <span className="text-gray-500 text-sm ml-2">- 증권정보 포털</span>
+              </a>
+              <a
+                href="https://www.kis.or.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">한국투자증권</span>
+                <span className="text-gray-500 text-sm ml-2">- 투자 정보</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
