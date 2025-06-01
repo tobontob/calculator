@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchExchangeRates, type ExchangeRates } from '@/utils/exchangeRate';
 
 interface ExchangeInputs {
   amount: string;
@@ -13,6 +14,8 @@ interface ExchangeResult {
   exchangeRate: number;
   commission: number;
   totalAmount: number;
+  buyRate?: number;
+  sellRate?: number;
 }
 
 export default function ExchangeCalculator() {
@@ -23,15 +26,28 @@ export default function ExchangeCalculator() {
   });
 
   const [result, setResult] = useState<ExchangeResult | null>(null);
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 주요 통화별 환율 (예시, 실제로는 API에서 받아와야 함)
-  const exchangeRates = {
-    USD: { rate: 1300, name: '미국 달러' },
-    JPY: { rate: 9.5, name: '일본 엔' },
-    EUR: { rate: 1450, name: '유로' },
-    CNY: { rate: 185, name: '중국 위안' },
-    GBP: { rate: 1700, name: '영국 파운드' },
-  };
+  useEffect(() => {
+    const loadExchangeRates = async () => {
+      try {
+        const rates = await fetchExchangeRates();
+        setExchangeRates(rates);
+        setLoading(false);
+      } catch (err) {
+        setError('환율 정보를 불러오는데 실패했습니다.');
+        setLoading(false);
+      }
+    };
+
+    loadExchangeRates();
+
+    // 1시간마다 환율 정보 갱신
+    const interval = setInterval(loadExchangeRates, 3600000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -43,21 +59,29 @@ export default function ExchangeCalculator() {
   };
 
   const calculateExchange = () => {
+    if (!exchangeRates) return;
+
     const amount = parseFloat(inputs.amount.replace(/,/g, '')) || 0;
     let rate = 1;
     let commission = 0;
+    let buyRate: number | undefined;
+    let sellRate: number | undefined;
 
     if (inputs.fromCurrency === 'KRW') {
-      rate = 1 / exchangeRates[inputs.toCurrency as keyof typeof exchangeRates].rate;
+      rate = 1 / exchangeRates[inputs.toCurrency].rate;
       commission = amount * 0.015; // 1.5% 수수료
+      sellRate = 1 / exchangeRates[inputs.toCurrency].sell;
     } else if (inputs.toCurrency === 'KRW') {
-      rate = exchangeRates[inputs.fromCurrency as keyof typeof exchangeRates].rate;
+      rate = exchangeRates[inputs.fromCurrency].rate;
       commission = amount * rate * 0.015; // 1.5% 수수료
+      buyRate = exchangeRates[inputs.fromCurrency].buy;
     } else {
-      const fromRate = exchangeRates[inputs.fromCurrency as keyof typeof exchangeRates].rate;
-      const toRate = exchangeRates[inputs.toCurrency as keyof typeof exchangeRates].rate;
+      const fromRate = exchangeRates[inputs.fromCurrency].rate;
+      const toRate = exchangeRates[inputs.toCurrency].rate;
       rate = fromRate / toRate;
       commission = amount * fromRate * 0.02; // 2% 수수료 (크로스환율)
+      buyRate = exchangeRates[inputs.fromCurrency].buy;
+      sellRate = 1 / exchangeRates[inputs.toCurrency].sell;
     }
 
     const convertedAmount = amount * rate;
@@ -69,9 +93,27 @@ export default function ExchangeCalculator() {
       convertedAmount,
       exchangeRate: rate,
       commission,
-      totalAmount
+      totalAmount,
+      buyRate,
+      sellRate
     });
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="text-center">환율 정보를 불러오는 중...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="text-center text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -139,9 +181,21 @@ export default function ExchangeCalculator() {
                 <h2 className="text-xl font-semibold mb-4">계산 결과</h2>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span>적용 환율:</span>
+                    <span>기준 환율:</span>
                     <span className="text-blue-600">1 {inputs.fromCurrency} = {result.exchangeRate.toFixed(4)} {inputs.toCurrency}</span>
                   </div>
+                  {result.buyRate && (
+                    <div className="flex justify-between">
+                      <span>매입 환율:</span>
+                      <span className="text-green-600">1 {inputs.fromCurrency} = {result.buyRate.toFixed(4)} KRW</span>
+                    </div>
+                  )}
+                  {result.sellRate && (
+                    <div className="flex justify-between">
+                      <span>매도 환율:</span>
+                      <span className="text-red-600">1 {inputs.toCurrency} = {(1/result.sellRate).toFixed(4)} KRW</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span>환전 금액:</span>
                     <span className="text-green-600">{result.convertedAmount.toLocaleString()} {inputs.toCurrency}</span>
@@ -164,17 +218,24 @@ export default function ExchangeCalculator() {
         {/* 오른쪽 컬럼: 정보 및 안내 */}
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold mb-4">환율 정보 안내</h2>
+            <h2 className="text-xl font-bold mb-4">실시간 환율 정보</h2>
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded">
                 <h3 className="font-semibold text-blue-600 mb-2">주요 통화 기준환율</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-1">
-                  {Object.entries(exchangeRates).map(([currency, info]) => (
+                  {exchangeRates && Object.entries(exchangeRates).map(([currency, info]) => (
                     <li key={currency}>
                       {info.name} ({currency}): {info.rate.toLocaleString()} 원
+                      <div className="text-sm ml-5">
+                        <div>매입: {info.buy.toLocaleString()} 원</div>
+                        <div>매도: {info.sell.toLocaleString()} 원</div>
+                      </div>
                     </li>
                   ))}
                 </ul>
+                <div className="text-xs text-gray-500 mt-2">
+                  * 실시간 환율 정보는 1시간마다 갱신됩니다.
+                </div>
               </div>
               <div className="bg-gray-50 p-4 rounded">
                 <h3 className="font-semibold text-blue-600 mb-2">환전 수수료</h3>
@@ -201,6 +262,15 @@ export default function ExchangeCalculator() {
             <h2 className="text-xl font-bold mb-4">관련 사이트</h2>
             <div className="grid grid-cols-1 gap-2">
               <a
+                href="https://www.koreaexim.go.kr/site/program/financial/exchange"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
+              >
+                <span className="text-blue-600">한국수출입은행</span>
+                <span className="text-gray-500 text-sm ml-2">- 실시간 환율정보</span>
+              </a>
+              <a
                 href="https://www.bok.or.kr/portal/main/main.do"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -208,15 +278,6 @@ export default function ExchangeCalculator() {
               >
                 <span className="text-blue-600">한국은행</span>
                 <span className="text-gray-500 text-sm ml-2">- 기준환율 고시</span>
-              </a>
-              <a
-                href="https://www.wooribank.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
-              >
-                <span className="text-blue-600">우리은행</span>
-                <span className="text-gray-500 text-sm ml-2">- 환전 서비스</span>
               </a>
               <a
                 href="https://www.customs.go.kr"
