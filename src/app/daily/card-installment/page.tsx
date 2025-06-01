@@ -34,11 +34,20 @@ export default function CardInstallmentCalculator() {
   const [result, setResult] = useState<CardInstallmentResult | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
-    setInputs(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setInputs(prev => ({
+        ...prev,
+        [name]: checked
+      }));
+    } else {
+      setInputs(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
     setResult(null);
   };
 
