@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { formatNumber } from '@/utils/format';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface FundInputs {
   initialInvestment: string;
@@ -13,18 +13,19 @@ interface FundInputs {
 }
 
 interface FundResult {
-  totalInvestment: number;
-  totalReturn: number;
-  netReturn: number;
-  totalFees: number;
+  finalBalance: string;
+  totalInvestment: string;
+  totalReturn: string;
+  totalFees: string;
+  netReturn: string;
   effectiveReturnRate: number;
-  yearlyBreakdown: {
+  yearlyBreakdown: Array<{
     year: number;
-    investment: number;
-    balance: number;
-    returns: number;
-    fees: number;
-  }[];
+    investment: string;
+    returns: string;
+    fees: string;
+    balance: string;
+  }>;
 }
 
 export default function FundCalculator() {
@@ -41,73 +42,87 @@ export default function FundCalculator() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    setInputs((prev) => ({
-      ...prev,
-      [name]: numericValue,
-    }));
+    if (name === 'initialInvestment' || name === 'monthlyInvestment') {
+      setInputs((prev) => ({
+        ...prev,
+        [name]: formatNumber(value),
+      }));
+    } else {
+      const numericValue = value.replace(/[^0-9.]/g, '');
+      setInputs((prev) => ({
+        ...prev,
+        [name]: numericValue,
+      }));
+    }
   };
 
   const calculateFundReturns = () => {
-    const initial = Number(inputs.initialInvestment) || 0;
-    const monthly = Number(inputs.monthlyInvestment) || 0;
-    const years = Number(inputs.investmentPeriod) || 0;
-    const returnRate = Number(inputs.expectedReturn) || 0;
-    const managementFee = Number(inputs.managementFee) || 0;
-    const salesFee = Number(inputs.salesFee) || 0;
+    const initial = parseFloat(inputs.initialInvestment.replace(/,/g, '')) || 0;
+    const monthly = parseFloat(inputs.monthlyInvestment.replace(/,/g, '')) || 0;
+    const years = parseInt(inputs.investmentPeriod) || 0;
+    const returnRate = parseFloat(inputs.expectedReturn) || 0;
+    const managementFee = parseFloat(inputs.managementFee) || 0;
+    const salesFee = parseFloat(inputs.salesFee) || 0;
 
     const monthlyRate = returnRate / 100 / 12;
     const totalMonths = years * 12;
     const yearlyBreakdown = [];
     
     let currentBalance = initial;
-    let totalInvested = initial;
+    let totalInvestment = initial;
     let totalFees = 0;
+    let yearInvestment = initial;
+    let yearReturns = 0;
+    let yearFees = 0;
+    let yearStartBalance = currentBalance;
 
-    for (let year = 1; year <= years; year++) {
-      let yearlyInvestment = 0;
-      let yearlyReturns = 0;
-      let yearlyFees = 0;
-
-      // 12개월 동안의 계산
-      for (let month = 1; month <= 12; month++) {
-        // 월별 투자금 추가
+    for (let month = 1; month <= totalMonths; month++) {
+      // 월별 투자금 추가
+      if (month > 1) {
         currentBalance += monthly;
-        yearlyInvestment += monthly;
-
-        // 수익 계산
-        const monthlyReturn = currentBalance * monthlyRate;
-        yearlyReturns += monthlyReturn;
-        currentBalance += monthlyReturn;
-
-        // 수수료 계산
-        const monthlyFees = currentBalance * ((managementFee / 100 / 12) + (salesFee / 100 / 12));
-        yearlyFees += monthlyFees;
-        currentBalance -= monthlyFees;
+        totalInvestment += monthly;
+        yearInvestment += monthly;
       }
 
-      totalInvested += yearlyInvestment;
-      totalFees += yearlyFees;
+      // 수익 계산
+      const monthlyReturn = currentBalance * monthlyRate;
+      currentBalance += monthlyReturn;
+      yearReturns += monthlyReturn;
 
-      yearlyBreakdown.push({
-        year,
-        investment: yearlyInvestment,
-        balance: currentBalance,
-        returns: yearlyReturns,
-        fees: yearlyFees,
-      });
+      // 수수료 계산
+      const monthlyFee = currentBalance * ((managementFee + salesFee) / 100 / 12);
+      currentBalance -= monthlyFee;
+      totalFees += monthlyFee;
+      yearFees += monthlyFee;
+
+      // 연간 정보 저장
+      if (month % 12 === 0) {
+        yearlyBreakdown.push({
+          year: month / 12,
+          investment: formatNumber(yearInvestment),
+          returns: formatNumber(yearReturns),
+          fees: formatNumber(yearFees),
+          balance: formatNumber(currentBalance)
+        });
+        yearInvestment = 0;
+        yearReturns = 0;
+        yearFees = 0;
+        yearStartBalance = currentBalance;
+      }
     }
 
-    const totalReturn = currentBalance - totalInvested;
-    const effectiveReturnRate = ((currentBalance / totalInvested) - 1) * 100;
+    const totalReturn = currentBalance - totalInvestment;
+    const netReturn = totalReturn - totalFees;
+    const effectiveReturnRate = ((currentBalance / totalInvestment) - 1) * 100;
 
     setResult({
-      totalInvestment: totalInvested,
-      totalReturn: totalReturn,
-      netReturn: currentBalance,
-      totalFees,
+      finalBalance: formatNumber(currentBalance),
+      totalInvestment: formatNumber(totalInvestment),
+      totalReturn: formatNumber(totalReturn),
+      totalFees: formatNumber(totalFees),
+      netReturn: formatNumber(netReturn),
       effectiveReturnRate,
-      yearlyBreakdown,
+      yearlyBreakdown
     });
   };
 

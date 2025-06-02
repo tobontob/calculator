@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 type PropertyType = '주택' | '건축물' | '토지';
 type LandType = '종합합산' | '별도합산' | '분리과세';
@@ -52,7 +53,7 @@ export default function EstateTaxCalculator() {
   const calculateTax = () => {
     if (!value) return;
 
-    const assessedValue = parseFloat(value);
+    const assessedValue = parseFloat(value.replace(/,/g, ''));
     let taxBase = 0;
     let estateTax = 0;
 
@@ -142,14 +143,14 @@ export default function EstateTaxCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">부동산 공시가격 (원)</label>
               <input
-                type="number"
+                type="text"
                 value={value}
                 onChange={(e) => {
-                  setValue(e.target.value);
+                  setValue(formatNumber(e.target.value));
                   setResult(null);
                 }}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="예: 300000000"
+                placeholder="예: 300,000,000"
               />
             </div>
 
@@ -166,20 +167,20 @@ export default function EstateTaxCalculator() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>과세표준액:</span>
-                    <span>{result.taxBase.toLocaleString()}원</span>
+                    <span>{formatNumber(result.taxBase)}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>재산세:</span>
-                    <span>{result.estateTax.toLocaleString()}원</span>
+                    <span>{formatNumber(result.estateTax)}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>지역자원시설세:</span>
-                    <span>{result.cityTax.toLocaleString()}원</span>
+                    <span>{formatNumber(result.cityTax)}원</span>
                   </div>
                   <div className="border-t border-gray-300 my-2"></div>
                   <div className="flex justify-between font-bold text-lg">
                     <span>총 세금:</span>
-                    <span className="text-blue-600">{result.totalTax.toLocaleString()}원</span>
+                    <span className="text-blue-600">{formatNumber(result.totalTax)}원</span>
                   </div>
                 </div>
               </div>

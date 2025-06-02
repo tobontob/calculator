@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface DeductionInputs {
   // 소득 정보
@@ -56,22 +57,52 @@ export default function YearEndTaxCalculator() {
   };
 
   const calculateTax = () => {
-    const yearIncome = parseFloat(inputs.yearIncome) || 0;
-    const taxWithheld = parseFloat(inputs.taxWithheld) || 0;
+    if (!inputs.yearIncome) return;
+
+    // 1. 연간 소득
+    const yearIncome = Number(parseNumber(inputs.yearIncome));
+    if (isNaN(yearIncome)) return;
+
+    // 2. 연금보험료 공제
+    const pension = Number(parseNumber(inputs.pension));
+    if (isNaN(pension)) return;
+
+    // 3. 보험료 공제
+    const insurance = Number(parseNumber(inputs.healthInsurance));
+    if (isNaN(insurance)) return;
+
+    // 4. 신용카드 공제
+    const creditCard = Number(parseNumber(inputs.creditCardDeduction));
+    if (isNaN(creditCard)) return;
+
+    // 5. 의료비 공제
+    const medical = Number(parseNumber(inputs.medicalExpense));
+    if (isNaN(medical)) return;
+
+    // 6. 교육비 공제
+    const education = Number(parseNumber(inputs.educationExpense));
+    if (isNaN(education)) return;
+
+    // 7. 기부금 공제
+    const donation = Number(parseNumber(inputs.donationAmount));
+    if (isNaN(donation)) return;
+
+    // 8. 기납부 세액
+    const taxWithheld = Number(parseNumber(inputs.taxWithheld));
+    if (isNaN(taxWithheld)) return;
+
     const dependents = parseInt(inputs.dependents) || 1;
     
     // 1. 소득공제 계산
     const basicDeduction = 1500000 * dependents; // 기본공제: 1인당 150만원
-    const pensionDeduction = (parseFloat(inputs.pension) || 0) * 0.12; // 연금보험료 공제
-    const insuranceDeduction = ((parseFloat(inputs.healthInsurance) || 0) + 
-                              (parseFloat(inputs.employmentInsurance) || 0)) * 0.12; // 보험료 공제
+    const pensionDeduction = pension * 0.12; // 연금보험료 공제
+    const insuranceDeduction = insurance * 0.12; // 보험료 공제
     
     // 2. 세액공제 계산
-    const creditCardTax = ((parseFloat(inputs.creditCardDeduction) || 0) + 
-                          (parseFloat(inputs.cashReceiptDeduction) || 0)) * 0.15; // 신용카드 등 사용금액 공제
-    const medicalTax = (parseFloat(inputs.medicalExpense) || 0) * 0.15; // 의료비 세액공제
-    const educationTax = (parseFloat(inputs.educationExpense) || 0) * 0.15; // 교육비 세액공제
-    const donationTax = (parseFloat(inputs.donationAmount) || 0) * 0.15; // 기부금 세액공제
+    const creditCardTax = creditCard * 0.15; // 신용카드 등 사용금액 공제
+    const medicalTax = medical * 0.15; // 의료비 세액공제
+    const educationTax = education * 0.15; // 교육비 세액공제
+    const donationTax = donation * 0.15; // 기부금 세액공제
 
     // 3. 과세표준 계산
     const totalDeduction = basicDeduction + pensionDeduction + insuranceDeduction;
@@ -118,25 +149,23 @@ export default function YearEndTaxCalculator() {
           <div className="space-y-4">
             {/* 소득 정보 */}
             <div>
-              <label className="block text-gray-700 mb-2">연간 총급여 (원)</label>
+              <label className="block text-gray-700 mb-2">연간 총소득 (원)</label>
               <input
-                type="number"
-                name="yearIncome"
+                type="text"
                 value={inputs.yearIncome}
-                onChange={handleInputChange}
-                placeholder="예: 50000000"
+                onChange={(e) => setInputs({ ...inputs, yearIncome: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 36,000,000"
               />
             </div>
             <div>
-              <label className="block text-gray-700 mb-2">기납부 원천징수세액 (원)</label>
+              <label className="block text-gray-700 mb-2">기납부 세액 (원)</label>
               <input
-                type="number"
-                name="taxWithheld"
+                type="text"
                 value={inputs.taxWithheld}
-                onChange={handleInputChange}
-                placeholder="예: 3000000"
+                onChange={(e) => setInputs({ ...inputs, taxWithheld: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 2,400,000"
               />
             </div>
 
@@ -155,36 +184,33 @@ export default function YearEndTaxCalculator() {
 
             {/* 소득공제 */}
             <div>
-              <label className="block text-gray-700 mb-2">연금보험료 (원)</label>
+              <label className="block text-gray-700 mb-2">연금보험료 납입액 (원)</label>
               <input
-                type="number"
-                name="pension"
+                type="text"
                 value={inputs.pension}
-                onChange={handleInputChange}
-                placeholder="국민연금 납입액"
+                onChange={(e) => setInputs({ ...inputs, pension: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 2,400,000"
               />
             </div>
             <div>
-              <label className="block text-gray-700 mb-2">건강보험료 (원)</label>
+              <label className="block text-gray-700 mb-2">보험료 납입액 (원)</label>
               <input
-                type="number"
-                name="healthInsurance"
+                type="text"
                 value={inputs.healthInsurance}
-                onChange={handleInputChange}
-                placeholder="건강보험 납입액"
+                onChange={(e) => setInputs({ ...inputs, healthInsurance: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 1,200,000"
               />
             </div>
             <div>
               <label className="block text-gray-700 mb-2">고용보험료 (원)</label>
               <input
-                type="number"
-                name="employmentInsurance"
+                type="text"
                 value={inputs.employmentInsurance}
-                onChange={handleInputChange}
-                placeholder="고용보험 납입액"
+                onChange={(e) => setInputs({ ...inputs, employmentInsurance: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 1,200,000"
               />
             </div>
 
@@ -192,56 +218,51 @@ export default function YearEndTaxCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">신용카드 사용액 (원)</label>
               <input
-                type="number"
-                name="creditCardDeduction"
+                type="text"
                 value={inputs.creditCardDeduction}
-                onChange={handleInputChange}
-                placeholder="신용카드 사용금액"
+                onChange={(e) => setInputs({ ...inputs, creditCardDeduction: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 15,000,000"
               />
             </div>
             <div>
               <label className="block text-gray-700 mb-2">현금영수증 (원)</label>
               <input
-                type="number"
-                name="cashReceiptDeduction"
+                type="text"
                 value={inputs.cashReceiptDeduction}
-                onChange={handleInputChange}
-                placeholder="현금영수증 금액"
+                onChange={(e) => setInputs({ ...inputs, cashReceiptDeduction: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 1,000,000"
               />
             </div>
             <div>
               <label className="block text-gray-700 mb-2">의료비 지출액 (원)</label>
               <input
-                type="number"
-                name="medicalExpense"
+                type="text"
                 value={inputs.medicalExpense}
-                onChange={handleInputChange}
-                placeholder="의료비 지출액"
+                onChange={(e) => setInputs({ ...inputs, medicalExpense: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 2,000,000"
               />
             </div>
             <div>
               <label className="block text-gray-700 mb-2">교육비 지출액 (원)</label>
               <input
-                type="number"
-                name="educationExpense"
+                type="text"
                 value={inputs.educationExpense}
-                onChange={handleInputChange}
-                placeholder="교육비 지출액"
+                onChange={(e) => setInputs({ ...inputs, educationExpense: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 3,000,000"
               />
             </div>
             <div>
-              <label className="block text-gray-700 mb-2">기부금 (원)</label>
+              <label className="block text-gray-700 mb-2">기부금 지출액 (원)</label>
               <input
-                type="number"
-                name="donationAmount"
+                type="text"
                 value={inputs.donationAmount}
-                onChange={handleInputChange}
-                placeholder="기부금액"
+                onChange={(e) => setInputs({ ...inputs, donationAmount: formatNumber(e.target.value) })}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 1,000,000"
               />
             </div>
 
@@ -254,28 +275,23 @@ export default function YearEndTaxCalculator() {
 
             {result && (
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                <h2 className="text-xl font-semibold mb-4">계산 결과</h2>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold mb-2">정산 내역</h3>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span>총 소득공제액:</span>
-                        <span>{result.totalDeduction.toLocaleString()}원</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>산출세액:</span>
-                        <span>{result.calculatedTax.toLocaleString()}원</span>
-                      </div>
-                      <div className="border-t border-gray-300 my-2"></div>
-                      <div className="flex justify-between font-semibold">
-                        <span>차감납부세액:</span>
-                        <span className={result.taxDifference >= 0 ? "text-blue-600" : "text-red-600"}>
-                          {Math.abs(result.taxDifference).toLocaleString()}원
-                          {result.taxDifference >= 0 ? " (환급)" : " (추가납부)"}
-                        </span>
-                      </div>
-                    </div>
+                <h3 className="font-semibold mb-2">계산 결과</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>총 소득공제:</span>
+                    <span>{formatNumber(result.totalDeduction)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>산출세액:</span>
+                    <span>{formatNumber(result.calculatedTax)}원</span>
+                  </div>
+                  <div className="border-t border-gray-300 my-2"></div>
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>환급/추가납부액:</span>
+                    <span className={result.taxDifference >= 0 ? "text-blue-600" : "text-red-600"}>
+                      {result.taxDifference >= 0 ? "+" : "-"}
+                      {formatNumber(Math.abs(result.taxDifference))}원
+                    </span>
                   </div>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber } from '@/utils/format';
 
 interface HouseholdDebtInputs {
   mortgage: string;
@@ -33,7 +34,7 @@ export default function HouseholdDebtCalculator() {
     const { name, value } = e.target;
     setInputs(prev => ({
       ...prev,
-      [name]: value
+      [name]: formatNumber(value)
     }));
     setResult(null);
   };

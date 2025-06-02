@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 type PropertyType = '아파트' | '주택' | '상가' | '토지';
 type AcquisitionType = '매매' | '분양권' | '증여' | '상속';
@@ -71,7 +72,7 @@ export default function AcquisitionTaxCalculator() {
   const calculateTax = () => {
     if (!price) return;
 
-    const priceValue = parseFloat(price);
+    const priceValue = parseFloat(price.replace(/,/g, ''));
     const rates = calculateTaxRates(propertyType, acquisitionType, priceValue, isFirstHome);
 
     const acquisitionTax = priceValue * rates.acquisitionTax;
@@ -135,14 +136,14 @@ export default function AcquisitionTaxCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">취득가액 (원)</label>
               <input
-                type="number"
+                type="text"
                 value={price}
                 onChange={(e) => {
-                  setPrice(e.target.value);
+                  setPrice(formatNumber(e.target.value));
                   setResult(null);
                 }}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="예: 300000000"
+                placeholder="예: 300,000,000"
               />
             </div>
 
@@ -176,24 +177,24 @@ export default function AcquisitionTaxCalculator() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>취득세:</span>
-                    <span>{result.acquisitionTax.toLocaleString()}원</span>
+                    <span>{formatNumber(result.acquisitionTax)}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>지방교육세:</span>
-                    <span>{result.specialTax.toLocaleString()}원</span>
+                    <span>{formatNumber(result.specialTax)}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>농어촌특별세:</span>
-                    <span>{result.agricultureTax.toLocaleString()}원</span>
+                    <span>{formatNumber(result.agricultureTax)}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>교육세:</span>
-                    <span>{result.educationTax.toLocaleString()}원</span>
+                    <span>{formatNumber(result.educationTax)}원</span>
                   </div>
                   <div className="border-t border-gray-300 my-2"></div>
                   <div className="flex justify-between font-bold text-lg">
                     <span>총 세금:</span>
-                    <span className="text-blue-600">{result.totalTax.toLocaleString()}원</span>
+                    <span className="text-blue-600">{formatNumber(result.totalTax)}원</span>
                   </div>
                 </div>
               </div>

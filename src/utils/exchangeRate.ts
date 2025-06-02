@@ -21,68 +21,43 @@ export interface ExchangeRateInfo {
   name: string;
   buy: number;  // 매입률
   sell: number; // 매도률
+  lastUpdate?: string; // 마지막 업데이트 시간
 }
 
 export interface ExchangeRates {
   [key: string]: ExchangeRateInfo;
 }
 
+// API 키 확인
+const API_KEY = process.env.NEXT_PUBLIC_EXCHANGE_API_KEY;
+if (!API_KEY) {
+  console.error('환율 API 키가 설정되지 않았습니다. (.env.local 파일에 NEXT_PUBLIC_EXCHANGE_API_KEY를 설정해주세요)');
+}
+
 // API 호출 함수
 export async function fetchExchangeRates(): Promise<ExchangeRates> {
   try {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const searchDate = `${year}${month}${day}`;
+    const response = await axios.get('/api/exchange');
+    
+    if (!response.data) {
+      throw new Error('유효하지 않은 API 응답');
+    }
 
-    const response = await axios.get(
-      `https://www.koreaexim.go.kr/site/program/financial/exchangeJSON`,
-      {
-        params: {
-          authkey: process.env.NEXT_PUBLIC_EXCHANGE_API_KEY,
-          searchdate: searchDate,
-          data: 'AP01'
-        }
-      }
-    );
-
+    // 현재 시간을 lastUpdate로 추가
+    const currentTime = new Date().toISOString();
     const exchangeRates: ExchangeRates = {};
     
-    response.data.forEach((item: ExchangeRateResponse) => {
-      const rate = parseFloat(item.deal_bas_r.replace(/,/g, ''));
-      const buy = parseFloat(item.ttb.replace(/,/g, ''));
-      const sell = parseFloat(item.tts.replace(/,/g, ''));
-      
-      switch(item.cur_unit) {
-        case 'USD':
-          exchangeRates.USD = { rate, name: '미국 달러', buy, sell };
-          break;
-        case 'JPY(100)':
-          exchangeRates.JPY = { rate: rate / 100, name: '일본 엔', buy: buy / 100, sell: sell / 100 };
-          break;
-        case 'EUR':
-          exchangeRates.EUR = { rate, name: '유로', buy, sell };
-          break;
-        case 'CNH':
-          exchangeRates.CNY = { rate, name: '중국 위안', buy, sell };
-          break;
-        case 'GBP':
-          exchangeRates.GBP = { rate, name: '영국 파운드', buy, sell };
-          break;
-      }
+    Object.entries(response.data).forEach(([currency, info]: [string, any]) => {
+      exchangeRates[currency] = {
+        ...info,
+        lastUpdate: currentTime
+      };
     });
 
     return exchangeRates;
   } catch (error) {
-    console.error('환율 정보를 가져오는데 실패했습니다:', error);
-    // 기본 환율 반환
-    return {
-      USD: { rate: 1300, name: '미국 달러', buy: 1290, sell: 1310 },
-      JPY: { rate: 9.5, name: '일본 엔', buy: 9.4, sell: 9.6 },
-      EUR: { rate: 1450, name: '유로', buy: 1440, sell: 1460 },
-      CNY: { rate: 185, name: '중국 위안', buy: 184, sell: 186 },
-      GBP: { rate: 1700, name: '영국 파운드', buy: 1690, sell: 1710 },
-    };
+    const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
+    console.error('환율 정보를 가져오는데 실패했습니다:', errorMessage);
+    throw error;
   }
 } 

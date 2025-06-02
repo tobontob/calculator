@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface Payment {
   month: number;
@@ -28,7 +29,7 @@ export default function LoanCalculator() {
       return;
     }
 
-    const P = parseFloat(principal); // 원금
+    const P = parseFloat(principal.replace(/,/g, '')); // 원금
     const r = parseFloat(interestRate) / 100 / 12; // 월 이자율
     const n = parseInt(loanTerm) * 12; // 총 납부 개월 수
     let payments: Payment[] = [];
@@ -42,10 +43,10 @@ export default function LoanCalculator() {
           for (let i = 1; i <= n; i++) {
             const payment: Payment = {
               month: i,
-              principal: i === n ? P : 0,
-              interest: monthlyInterest,
-              total: i === n ? P + monthlyInterest : monthlyInterest,
-              remainingPrincipal: i === n ? 0 : P
+              principal: i === n ? Math.round(P) : 0,
+              interest: Math.round(monthlyInterest),
+              total: i === n ? Math.round(P + monthlyInterest) : Math.round(monthlyInterest),
+              remainingPrincipal: i === n ? 0 : Math.round(P)
             };
             payments.push(payment);
             totalInterest += monthlyInterest;
@@ -63,10 +64,10 @@ export default function LoanCalculator() {
             const monthlyInterest = remainingPrincipal * r;
             const payment: Payment = {
               month: i,
-              principal: monthlyPrincipal,
-              interest: monthlyInterest,
-              total: monthlyPrincipal + monthlyInterest,
-              remainingPrincipal: remainingPrincipal - monthlyPrincipal
+              principal: Math.round(monthlyPrincipal),
+              interest: Math.round(monthlyInterest),
+              total: Math.round(monthlyPrincipal + monthlyInterest),
+              remainingPrincipal: Math.round(remainingPrincipal - monthlyPrincipal)
             };
             payments.push(payment);
             totalInterest += monthlyInterest;
@@ -87,10 +88,10 @@ export default function LoanCalculator() {
             const monthlyPrincipal = monthlyPayment - monthlyInterest;
             const payment: Payment = {
               month: i,
-              principal: monthlyPrincipal,
-              interest: monthlyInterest,
-              total: monthlyPayment,
-              remainingPrincipal: remainingPrincipal - monthlyPrincipal
+              principal: Math.round(monthlyPrincipal),
+              interest: Math.round(monthlyInterest),
+              total: Math.round(monthlyPayment),
+              remainingPrincipal: Math.round(remainingPrincipal - monthlyPrincipal)
             };
             payments.push(payment);
             totalInterest += monthlyInterest;
@@ -102,14 +103,10 @@ export default function LoanCalculator() {
 
     setPayments(payments);
     setSummary({
-      totalPayment: P + totalInterest,
-      totalInterest: totalInterest,
-      monthlyPayment: monthlyPayment,
+      totalPayment: Math.round(P + totalInterest),
+      totalInterest: Math.round(totalInterest),
+      monthlyPayment: Math.round(monthlyPayment),
     });
-  };
-
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('ko-KR').format(Math.round(num));
   };
 
   return (
@@ -123,9 +120,9 @@ export default function LoanCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">대출금액 (원)</label>
               <input
-                type="number"
+                type="text"
                 value={principal}
-                onChange={(e) => setPrincipal(e.target.value)}
+                onChange={(e) => setPrincipal(formatNumber(e.target.value))}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="대출금액을 입력하세요"
               />
@@ -180,15 +177,15 @@ export default function LoanCalculator() {
                     <div className="space-y-1 text-sm">
                       <div className="flex justify-between">
                         <span>총 상환금액:</span>
-                        <span>{summary.totalPayment.toLocaleString()}원</span>
+                        <span>{formatNumber(summary.totalPayment)}원</span>
                       </div>
                       <div className="flex justify-between">
                         <span>총 이자금액:</span>
-                        <span>{summary.totalInterest.toLocaleString()}원</span>
+                        <span>{formatNumber(summary.totalInterest)}원</span>
                       </div>
                       <div className="flex justify-between">
                         <span>월 평균 상환금액:</span>
-                        <span>{summary.monthlyPayment.toLocaleString()}원</span>
+                        <span>{formatNumber(summary.monthlyPayment)}원</span>
                       </div>
                     </div>
                   </div>
@@ -277,10 +274,10 @@ export default function LoanCalculator() {
                 {payments.map((payment) => (
                   <tr key={payment.month} className="border-b">
                     <td className="px-2 py-2 text-left text-xs md:text-base md:px-4">{payment.month}회차</td>
-                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{payment.principal.toLocaleString()}원</td>
-                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{payment.interest.toLocaleString()}원</td>
-                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{payment.total.toLocaleString()}원</td>
-                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{payment.remainingPrincipal.toLocaleString()}원</td>
+                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{formatNumber(payment.principal)}원</td>
+                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{formatNumber(payment.interest)}원</td>
+                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{formatNumber(payment.total)}원</td>
+                    <td className="px-2 py-2 text-right text-xs md:text-base md:px-4">{formatNumber(payment.remainingPrincipal)}원</td>
                   </tr>
                 ))}
               </tbody>

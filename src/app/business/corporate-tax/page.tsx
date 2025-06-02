@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber } from '@/utils/format';
 
 interface CorporateTaxInputs {
   revenue: string;
@@ -31,7 +32,7 @@ export default function CorporateTaxCalculator() {
     const { name, value, type, checked } = e.target;
     setInputs(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : type === 'text' ? formatNumber(value) : value
     }));
     setResult(null);
   };

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber } from '@/utils/format';
 
 interface BusinessIncomeInputs {
   revenue: string;
@@ -35,7 +36,7 @@ export default function BusinessIncomeTaxCalculator() {
       const { name, value, type, checked } = e.target;
       setInputs(prev => ({
         ...prev,
-        [name]: type === 'checkbox' ? checked : value
+        [name]: type === 'checkbox' ? checked : type === 'text' ? formatNumber(value) : value
       }));
     } else {
       const { name, value } = e.target;

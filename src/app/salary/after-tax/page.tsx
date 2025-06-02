@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 export default function AfterTaxCalculator() {
   const [salary, setSalary] = useState('');
@@ -18,9 +19,14 @@ export default function AfterTaxCalculator() {
   } | null>(null);
 
   const calculateAfterTax = () => {
+    if (!salary) return;
+    
+    const parsedSalary = Number(parseNumber(salary));
+    if (isNaN(parsedSalary)) return;
+    
     const grossIncome = paymentType === 'yearly' 
-      ? parseFloat(salary) / 12 
-      : parseFloat(salary);
+      ? parsedSalary / 12 
+      : parsedSalary;
 
     // 4대 보험 요율 (2024년 기준)
     const nationalPensionRate = 0.045; // 4.5%
@@ -112,11 +118,11 @@ export default function AfterTaxCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">{paymentType === 'yearly' ? '연봉' : '월급'} (원)</label>
               <input
-                type="number"
+                type="text"
                 value={salary}
-                onChange={(e) => setSalary(e.target.value)}
+                onChange={(e) => setSalary(formatNumber(e.target.value))}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder={paymentType === 'yearly' ? '예: 36000000' : '예: 3000000'}
+                placeholder={paymentType === 'yearly' ? '예: 36,000,000' : '예: 3,000,000'}
               />
             </div>
 
@@ -130,50 +136,43 @@ export default function AfterTaxCalculator() {
             {result && (
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                 <h2 className="text-xl font-semibold mb-4">계산 결과</h2>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold mb-2">월 급여 명세</h3>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span>총 급여:</span>
-                        <span>{result.grossIncome.toLocaleString()}원</span>
-                      </div>
-                      <div className="border-t border-gray-300 my-2"></div>
-                      <div className="flex justify-between text-red-600">
-                        <span>국민연금:</span>
-                        <span>-{result.nationalPension.toLocaleString()}원</span>
-                      </div>
-                      <div className="flex justify-between text-red-600">
-                        <span>건강보험:</span>
-                        <span>-{result.healthInsurance.toLocaleString()}원</span>
-                      </div>
-                      <div className="flex justify-between text-red-600">
-                        <span>장기요양보험:</span>
-                        <span>-{result.longTermCare.toLocaleString()}원</span>
-                      </div>
-                      <div className="flex justify-between text-red-600">
-                        <span>고용보험:</span>
-                        <span>-{result.employmentInsurance.toLocaleString()}원</span>
-                      </div>
-                      <div className="flex justify-between text-red-600">
-                        <span>소득세:</span>
-                        <span>-{result.incomeTax.toLocaleString()}원</span>
-                      </div>
-                      <div className="flex justify-between text-red-600">
-                        <span>지방소득세:</span>
-                        <span>-{result.localIncomeTax.toLocaleString()}원</span>
-                      </div>
-                      <div className="border-t border-gray-300 my-2"></div>
-                      <div className="flex justify-between font-semibold">
-                        <span>총 공제액:</span>
-                        <span className="text-red-600">-{result.totalDeduction.toLocaleString()}원</span>
-                      </div>
-                      <div className="border-t border-gray-300 my-2"></div>
-                      <div className="flex justify-between font-semibold">
-                        <span>실수령액:</span>
-                        <span className="text-blue-600">{result.netIncome.toLocaleString()}원</span>
-                      </div>
-                    </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>총 급여:</span>
+                    <span>{formatNumber(result.grossIncome)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>국민연금:</span>
+                    <span>{formatNumber(result.nationalPension)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>건강보험:</span>
+                    <span>{formatNumber(result.healthInsurance)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>장기요양보험:</span>
+                    <span>{formatNumber(result.longTermCare)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>고용보험:</span>
+                    <span>{formatNumber(result.employmentInsurance)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>소득세:</span>
+                    <span>{formatNumber(result.incomeTax)}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>지방소득세:</span>
+                    <span>{formatNumber(result.localIncomeTax)}원</span>
+                  </div>
+                  <div className="border-t border-gray-300 my-2"></div>
+                  <div className="flex justify-between">
+                    <span>총 공제액:</span>
+                    <span>{formatNumber(result.totalDeduction)}원</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>실수령액:</span>
+                    <span className="text-blue-600">{formatNumber(result.netIncome)}원</span>
                   </div>
                 </div>
               </div>

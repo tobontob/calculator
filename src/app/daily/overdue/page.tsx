@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface CalculationResult {
   overdueInterest: number;
@@ -21,7 +22,7 @@ export default function OverdueCalculator() {
   const [result, setResult] = useState<CalculationResult | null>(null);
 
   const calculateOverdueInterest = () => {
-    const amount = parseFloat(principal);
+    const amount = parseFloat(principal.replace(/,/g, ''));
     const annualRate = parseFloat(interestRate);
     const days = parseInt(overdueDays);
     const dailyRate = annualRate / 365 / 100;
@@ -65,9 +66,9 @@ export default function OverdueCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">연체금액 (원)</label>
               <input
-                type="number"
+                type="text"
                 value={principal}
-                onChange={(e) => setPrincipal(e.target.value)}
+                onChange={(e) => setPrincipal(formatNumber(e.target.value))}
                 placeholder="0"
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />

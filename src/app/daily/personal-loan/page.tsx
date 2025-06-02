@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface PersonalLoanInputs {
   loanAmount: string;
@@ -10,16 +11,16 @@ interface PersonalLoanInputs {
 }
 
 interface PersonalLoanResult {
-  monthlyPayment: number;
-  totalInterest: number;
-  totalPayment: number;
-  schedule: {
+  monthlyPayment: string;
+  totalInterest: string;
+  totalPayment: string;
+  schedule: Array<{
     month: number;
-    principal: number;
-    interest: number;
-    totalPayment: number;
-    remainingBalance: number;
-  }[];
+    payment: string;
+    principal: string;
+    interest: string;
+    balance: string;
+  }>;
 }
 
 export default function PersonalLoanCalculator() {
@@ -34,10 +35,17 @@ export default function PersonalLoanCalculator() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setInputs(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (name === 'loanAmount') {
+      setInputs(prev => ({
+        ...prev,
+        [name]: formatNumber(value)
+      }));
+    } else {
+      setInputs(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
     setResult(null);
   };
 
@@ -52,22 +60,24 @@ export default function PersonalLoanCalculator() {
     const schedule = [];
     let remainingBalance = principal;
 
-    if (inputs.repaymentType === 'equal-payment') {
+    if (inputs.repaymentType === 'equal-payment' && monthlyRate > 0) {
       // 원리금균등상환
       monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+      
+      let totalPaid = monthlyPayment * months;
+      totalInterest = totalPaid - principal;
 
       for (let i = 1; i <= months; i++) {
-        const interest = remainingBalance * monthlyRate;
-        const principalPayment = monthlyPayment - interest;
-        totalInterest += interest;
+        const interestPayment = remainingBalance * monthlyRate;
+        const principalPayment = monthlyPayment - interestPayment;
         remainingBalance -= principalPayment;
 
         schedule.push({
           month: i,
-          principal: principalPayment,
-          interest: interest,
-          totalPayment: monthlyPayment,
-          remainingBalance: Math.max(0, remainingBalance)
+          payment: formatNumber(monthlyPayment),
+          principal: formatNumber(principalPayment),
+          interest: formatNumber(interestPayment),
+          balance: formatNumber(Math.max(0, remainingBalance))
         });
       }
     } else {
@@ -75,27 +85,25 @@ export default function PersonalLoanCalculator() {
       const monthlyPrincipal = principal / months;
 
       for (let i = 1; i <= months; i++) {
-        const interest = remainingBalance * monthlyRate;
-        totalInterest += interest;
-        const payment = monthlyPrincipal + interest;
+        const interestPayment = remainingBalance * monthlyRate;
+        monthlyPayment = monthlyPrincipal + interestPayment;
+        totalInterest += interestPayment;
         remainingBalance -= monthlyPrincipal;
 
         schedule.push({
           month: i,
-          principal: monthlyPrincipal,
-          interest: interest,
-          totalPayment: payment,
-          remainingBalance: Math.max(0, remainingBalance)
+          payment: formatNumber(monthlyPayment),
+          principal: formatNumber(monthlyPrincipal),
+          interest: formatNumber(interestPayment),
+          balance: formatNumber(Math.max(0, remainingBalance))
         });
-
-        if (i === 1) monthlyPayment = payment;
       }
     }
 
     setResult({
-      monthlyPayment,
-      totalInterest,
-      totalPayment: principal + totalInterest,
+      monthlyPayment: formatNumber(monthlyPayment),
+      totalInterest: formatNumber(totalInterest),
+      totalPayment: formatNumber(principal + totalInterest),
       schedule
     });
   };
@@ -167,29 +175,28 @@ export default function PersonalLoanCalculator() {
 
             {result && (
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                <h2 className="text-xl font-semibold mb-4">계산 결과</h2>
-                <div className="space-y-1 text-sm">
+                <h2 className="text-xl font-semibold mb-4">대출 상환 정보</h2>
+                <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>첫 달 상환금액:</span>
-                    <span className="text-blue-600">{result.monthlyPayment.toLocaleString()}원</span>
+                    <span>월 상환금액:</span>
+                    <span className="font-semibold">{result.monthlyPayment}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>총 이자:</span>
-                    <span className="text-red-600">{result.totalInterest.toLocaleString()}원</span>
+                    <span className="font-semibold">{result.totalInterest}원</span>
                   </div>
-                  <div className="border-t border-gray-300 my-2"></div>
-                  <div className="flex justify-between font-semibold">
+                  <div className="flex justify-between">
                     <span>총 상환금액:</span>
-                    <span>{result.totalPayment.toLocaleString()}원</span>
+                    <span className="font-semibold">{result.totalPayment}원</span>
                   </div>
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-6">
                   <h3 className="font-semibold mb-2">상환 스케줄</h3>
-                  <div className="max-h-60 overflow-y-auto">
-                    <table className="w-full text-sm">
-                      <thead className="bg-gray-100">
-                        <tr>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="bg-gray-100">
                           <th className="p-2 text-left">회차</th>
                           <th className="p-2 text-right">원금</th>
                           <th className="p-2 text-right">이자</th>
@@ -200,9 +207,9 @@ export default function PersonalLoanCalculator() {
                         {result.schedule.map((item) => (
                           <tr key={item.month} className="border-b">
                             <td className="p-2">{item.month}회차</td>
-                            <td className="p-2 text-right">{item.principal.toLocaleString()}원</td>
-                            <td className="p-2 text-right">{item.interest.toLocaleString()}원</td>
-                            <td className="p-2 text-right">{item.remainingBalance.toLocaleString()}원</td>
+                            <td className="p-2 text-right">{item.principal}원</td>
+                            <td className="p-2 text-right">{item.interest}원</td>
+                            <td className="p-2 text-right">{item.balance}원</td>
                           </tr>
                         ))}
                       </tbody>

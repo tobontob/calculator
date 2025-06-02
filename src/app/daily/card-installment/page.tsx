@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface CardInstallmentInputs {
   purchaseAmount: string;
@@ -10,17 +11,16 @@ interface CardInstallmentInputs {
 }
 
 interface CardInstallmentResult {
-  monthlyPayment: number;
-  totalInterest: number;
-  totalPayment: number;
-  initialPayment: number;
-  schedule: {
+  monthlyPayment: string;
+  totalInterest: string;
+  totalAmount: string;
+  schedule: Array<{
     month: number;
-    principal: number;
-    interest: number;
-    payment: number;
-    remainingBalance: number;
-  }[];
+    payment: string;
+    principal: string;
+    interest: string;
+    balance: string;
+  }>;
 }
 
 export default function CardInstallmentCalculator() {
@@ -42,6 +42,11 @@ export default function CardInstallmentCalculator() {
         ...prev,
         [name]: checked
       }));
+    } else if (name === 'purchaseAmount') {
+      setInputs(prev => ({
+        ...prev,
+        [name]: formatNumber(value)
+      }));
     } else {
       setInputs(prev => ({
         ...prev,
@@ -57,38 +62,47 @@ export default function CardInstallmentCalculator() {
     const annualRate = parseFloat(inputs.interestRate) || 0;
     const monthlyRate = annualRate / 12 / 100;
 
-    // 초기납입금 계산 (구매금액의 10%)
-    const initialPayment = inputs.hasInitialPayment ? amount * 0.1 : 0;
-    const installmentAmount = amount - initialPayment;
-
-    // 월 할부금 계산 (원리금균등상환방식)
-    const monthlyPayment = installmentAmount * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
-
-    let remainingBalance = installmentAmount;
+    let monthlyPayment = 0;
     let totalInterest = 0;
     const schedule = [];
+    let remainingBalance = amount;
 
-    for (let i = 1; i <= months; i++) {
-      const interest = remainingBalance * monthlyRate;
-      const principal = monthlyPayment - interest;
-      
-      totalInterest += interest;
-      remainingBalance -= principal;
+    if (monthlyRate > 0) {
+      monthlyPayment = amount * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+      let totalPaid = monthlyPayment * months;
+      totalInterest = totalPaid - amount;
 
-      schedule.push({
-        month: i,
-        principal,
-        interest,
-        payment: monthlyPayment,
-        remainingBalance: Math.max(0, remainingBalance)
-      });
+      for (let i = 1; i <= months; i++) {
+        const interestPayment = remainingBalance * monthlyRate;
+        const principalPayment = monthlyPayment - interestPayment;
+        remainingBalance -= principalPayment;
+
+        schedule.push({
+          month: i,
+          payment: formatNumber(monthlyPayment),
+          principal: formatNumber(principalPayment),
+          interest: formatNumber(interestPayment),
+          balance: formatNumber(Math.max(0, remainingBalance))
+        });
+      }
+    } else {
+      monthlyPayment = amount / months;
+      for (let i = 1; i <= months; i++) {
+        remainingBalance -= monthlyPayment;
+        schedule.push({
+          month: i,
+          payment: formatNumber(monthlyPayment),
+          principal: formatNumber(monthlyPayment),
+          interest: '0',
+          balance: formatNumber(Math.max(0, remainingBalance))
+        });
+      }
     }
 
     setResult({
-      monthlyPayment,
-      totalInterest,
-      totalPayment: initialPayment + (monthlyPayment * months),
-      initialPayment,
+      monthlyPayment: formatNumber(monthlyPayment),
+      totalInterest: formatNumber(totalInterest),
+      totalAmount: formatNumber(amount + totalInterest),
       schedule
     });
   };
@@ -115,24 +129,14 @@ export default function CardInstallmentCalculator() {
 
             <div>
               <label className="block text-gray-700 mb-2">할부기간 (개월)</label>
-              <select
+              <input
+                type="text"
                 name="installmentPeriod"
                 value={inputs.installmentPeriod}
                 onChange={handleInputChange}
+                placeholder="12"
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">선택하세요</option>
-                <option value="2">2개월</option>
-                <option value="3">3개월</option>
-                <option value="4">4개월</option>
-                <option value="5">5개월</option>
-                <option value="6">6개월</option>
-                <option value="9">9개월</option>
-                <option value="12">12개월</option>
-                <option value="18">18개월</option>
-                <option value="24">24개월</option>
-                <option value="36">36개월</option>
-              </select>
+              />
             </div>
 
             <div>
@@ -144,21 +148,7 @@ export default function CardInstallmentCalculator() {
                 onChange={handleInputChange}
                 placeholder="0"
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                step="0.1"
               />
-            </div>
-
-            <div>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="hasInitialPayment"
-                  checked={inputs.hasInitialPayment}
-                  onChange={handleInputChange}
-                  className="form-checkbox h-4 w-4 text-blue-600"
-                />
-                <span className="ml-2">초기납입금 적용 (10%)</span>
-              </label>
             </div>
 
             <button
@@ -170,35 +160,28 @@ export default function CardInstallmentCalculator() {
 
             {result && (
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                <h2 className="text-xl font-semibold mb-4">계산 결과</h2>
-                <div className="space-y-1 text-sm">
-                  {result.initialPayment > 0 && (
-                    <div className="flex justify-between">
-                      <span>초기납입금:</span>
-                      <span className="text-purple-600">{result.initialPayment.toLocaleString()}원</span>
-                    </div>
-                  )}
+                <h2 className="text-xl font-semibold mb-4">할부 상환 정보</h2>
+                <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>월 할부금:</span>
-                    <span className="text-blue-600">{result.monthlyPayment.toLocaleString()}원</span>
+                    <span className="font-semibold">{result.monthlyPayment}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>총 이자:</span>
-                    <span className="text-red-600">{result.totalInterest.toLocaleString()}원</span>
+                    <span className="font-semibold">{result.totalInterest}원</span>
                   </div>
-                  <div className="border-t border-gray-300 my-2"></div>
-                  <div className="flex justify-between font-semibold">
+                  <div className="flex justify-between">
                     <span>총 결제금액:</span>
-                    <span>{result.totalPayment.toLocaleString()}원</span>
+                    <span className="font-semibold">{result.totalAmount}원</span>
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <h3 className="font-semibold mb-2">할부 상환 스케줄</h3>
-                  <div className="max-h-60 overflow-y-auto">
-                    <table className="w-full text-sm">
-                      <thead className="bg-gray-100">
-                        <tr>
+                <div className="mt-6">
+                  <h3 className="font-semibold mb-2">상환 스케줄</h3>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="bg-gray-100">
                           <th className="p-2 text-left">회차</th>
                           <th className="p-2 text-right">원금</th>
                           <th className="p-2 text-right">이자</th>
@@ -209,9 +192,9 @@ export default function CardInstallmentCalculator() {
                         {result.schedule.map((item) => (
                           <tr key={item.month} className="border-b">
                             <td className="p-2">{item.month}회차</td>
-                            <td className="p-2 text-right">{item.principal.toLocaleString()}원</td>
-                            <td className="p-2 text-right">{item.interest.toLocaleString()}원</td>
-                            <td className="p-2 text-right">{item.remainingBalance.toLocaleString()}원</td>
+                            <td className="p-2 text-right">{item.principal}원</td>
+                            <td className="p-2 text-right">{item.interest}원</td>
+                            <td className="p-2 text-right">{item.balance}원</td>
                           </tr>
                         ))}
                       </tbody>
@@ -226,77 +209,35 @@ export default function CardInstallmentCalculator() {
         {/* 오른쪽 컬럼: 정보 및 안내 */}
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold mb-4">카드할부 안내</h2>
+            <h2 className="text-xl font-bold mb-4">할부 이용 안내</h2>
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded">
-                <h3 className="font-semibold text-blue-600 mb-2">할부 수수료율</h3>
+                <h3 className="font-semibold text-blue-600 mb-2">무이자 할부</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-1">
-                  <li>일반할부: 연 11~21% 수준</li>
-                  <li>무이자할부: 가맹점 부담</li>
-                  <li>부분무이자: 일부기간 무이자</li>
-                  <li>카드사별로 상이할 수 있음</li>
+                  <li>2~3개월: 대부분의 가맹점</li>
+                  <li>4~6개월: 특별 행사 및 제휴 가맹점</li>
+                  <li>10~12개월: 대형 가전, 특별 프로모션</li>
                 </ul>
               </div>
+              
               <div className="bg-gray-50 p-4 rounded">
-                <h3 className="font-semibold text-blue-600 mb-2">할부 기간</h3>
+                <h3 className="font-semibold text-blue-600 mb-2">일반 할부</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-1">
-                  <li>일반할부: 2~36개월</li>
-                  <li>무이자할부: 2~12개월</li>
-                  <li>최소할부금액: 5만원 이상</li>
-                  <li>장기할부: 18개월 이상</li>
+                  <li>2~36개월 할부 가능</li>
+                  <li>할부 금리: 연 6~21%</li>
+                  <li>최소 할부 금액: 5만원 이상</li>
                 </ul>
               </div>
+
               <div className="bg-gray-50 p-4 rounded">
                 <h3 className="font-semibold text-blue-600 mb-2">유의사항</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-1">
-                  <li>할부금 연체 시 연체이자 발생</li>
-                  <li>중도상환 시 수수료 확인</li>
-                  <li>카드한도 및 할부한도 확인</li>
-                  <li>무이자할부 조건 확인</li>
+                  <li>할부 금리는 카드사별로 상이</li>
+                  <li>중도상환 수수료 확인 필요</li>
+                  <li>연체 시 높은 연체이자율 적용</li>
+                  <li>장기할부 시 총 부담 증가</li>
                 </ul>
               </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold mb-4">관련 사이트</h2>
-            <div className="grid grid-cols-1 gap-2">
-              <a
-                href="https://www.fss.or.kr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
-              >
-                <span className="text-blue-600">금융감독원</span>
-                <span className="text-gray-500 text-sm ml-2">- 카드수수료 비교</span>
-              </a>
-              <a
-                href="https://www.crefia.or.kr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
-              >
-                <span className="text-blue-600">여신금융협회</span>
-                <span className="text-gray-500 text-sm ml-2">- 카드정보</span>
-              </a>
-              <a
-                href="https://www.credit.or.kr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
-              >
-                <span className="text-blue-600">신용회복위원회</span>
-                <span className="text-gray-500 text-sm ml-2">- 채무조정</span>
-              </a>
-              <a
-                href="https://www.kfb.or.kr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors flex items-center"
-              >
-                <span className="text-blue-600">은행연합회</span>
-                <span className="text-gray-500 text-sm ml-2">- 금융정보</span>
-              </a>
             </div>
           </div>
         </div>

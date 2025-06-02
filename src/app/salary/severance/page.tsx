@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface WorkPeriod {
   startDate: string;
@@ -40,7 +41,8 @@ export default function SeveranceCalculator() {
 
     const startDate = new Date(workPeriod.startDate);
     const endDate = new Date(workPeriod.endDate);
-    const averageMonthlyWage = parseFloat(monthlyWage);
+    const wage = Number(parseNumber(monthlyWage));
+    if (isNaN(wage)) return;
 
     if (endDate <= startDate) {
       alert('퇴사일이 입사일보다 빠를 수 없습니다.');
@@ -57,20 +59,20 @@ export default function SeveranceCalculator() {
         months,
         days,
         severancePay: 0,
-        averageMonthlyWage
+        averageMonthlyWage: wage
       });
       return;
     }
 
     // 퇴직금 = 평균임금 30일분 × 근속연수
-    const severancePay = Math.round((averageMonthlyWage / 30) * 30 * totalYears);
+    const severancePay = Math.round((wage / 30) * 30 * totalYears);
 
     setResult({
       years,
       months,
       days,
       severancePay,
-      averageMonthlyWage
+      averageMonthlyWage: wage
     });
   };
 
@@ -105,10 +107,10 @@ export default function SeveranceCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">평균임금 (원/월)</label>
               <input
-                type="number"
+                type="text"
                 value={monthlyWage}
-                onChange={(e) => setMonthlyWage(e.target.value)}
-                placeholder="예: 3000000"
+                onChange={(e) => setMonthlyWage(formatNumber(e.target.value))}
+                placeholder="예: 3,000,000"
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -122,25 +124,20 @@ export default function SeveranceCalculator() {
 
             {result && (
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                <h2 className="text-xl font-semibold mb-4">계산 결과</h2>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold mb-2">퇴직금 내역</h3>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span>근속기간:</span>
-                        <span>{result.years}년 {result.months}개월 {result.days}일</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>평균임금(월):</span>
-                        <span>{result.averageMonthlyWage.toLocaleString()}원</span>
-                      </div>
-                      <div className="border-t border-gray-300 my-2"></div>
-                      <div className="flex justify-between font-semibold">
-                        <span>예상 퇴직금:</span>
-                        <span className="text-blue-600">{result.severancePay.toLocaleString()}원</span>
-                      </div>
-                    </div>
+                <h3 className="font-semibold mb-2">계산 결과</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>근속기간:</span>
+                    <span>{result.years}년 {result.months}개월 {result.days}일</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>평균임금:</span>
+                    <span>{formatNumber(result.averageMonthlyWage)}원/월</span>
+                  </div>
+                  <div className="border-t border-gray-300 my-2"></div>
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>퇴직금:</span>
+                    <span className="text-blue-600">{formatNumber(result.severancePay)}원</span>
                   </div>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 export default function RentCalculator() {
   const [calculationType, setCalculationType] = useState<'월세전환' | '전세전환'>('월세전환');
@@ -14,8 +15,8 @@ export default function RentCalculator() {
   } | null>(null);
 
   const calculateRent = () => {
-    const depositValue = parseFloat(deposit);
-    const monthlyRentValue = parseFloat(monthlyRent);
+    const depositValue = parseFloat(deposit.replace(/,/g, ''));
+    const monthlyRentValue = parseFloat(monthlyRent.replace(/,/g, ''));
     const rateValue = parseFloat(conversionRate) / 100;
 
     if (calculationType === '월세전환') {
@@ -84,28 +85,28 @@ export default function RentCalculator() {
               <div>
                 <label className="block text-gray-700 mb-2">전세 보증금 (원)</label>
                 <input
-                  type="number"
+                  type="text"
                   value={deposit}
                   onChange={(e) => {
-                    setDeposit(e.target.value);
+                    setDeposit(formatNumber(e.target.value));
                     setResult(null);
                   }}
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="예: 200000000"
+                  placeholder="예: 200,000,000"
                 />
               </div>
             ) : (
               <div>
                 <label className="block text-gray-700 mb-2">월세 (원)</label>
                 <input
-                  type="number"
+                  type="text"
                   value={monthlyRent}
                   onChange={(e) => {
-                    setMonthlyRent(e.target.value);
+                    setMonthlyRent(formatNumber(e.target.value));
                     setResult(null);
                   }}
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="예: 1000000"
+                  placeholder="예: 1,000,000"
                 />
               </div>
             )}
@@ -139,22 +140,22 @@ export default function RentCalculator() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>전환 월세:</span>
-                      <span>{result.convertedValue.toLocaleString()}원/월</span>
+                      <span>{formatNumber(result.convertedValue)}원/월</span>
                     </div>
                     <div className="flex justify-between">
                       <span>연간 이자:</span>
-                      <span>{result.yearlyInterest.toLocaleString()}원/년</span>
+                      <span>{formatNumber(result.yearlyInterest)}원/년</span>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>전환 보증금:</span>
-                      <span>{result.convertedValue.toLocaleString()}원</span>
+                      <span>{formatNumber(result.convertedValue)}원</span>
                     </div>
                     <div className="flex justify-between">
                       <span>연간 월세 총액:</span>
-                      <span>{result.yearlyInterest.toLocaleString()}원/년</span>
+                      <span>{formatNumber(result.yearlyInterest)}원/년</span>
                     </div>
                   </div>
                 )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 type RepaymentType = '원리금균등' | '원금균등' | '만기일시';
 
@@ -23,7 +24,7 @@ export default function MortgageCalculator() {
   } | null>(null);
 
   const calculateMortgage = () => {
-    const principal = parseFloat(loanAmount);
+    const principal = parseFloat(loanAmount.replace(/,/g, ''));
     const annualRate = parseFloat(interestRate) / 100;
     const monthlyRate = annualRate / 12;
     const totalMonths = parseFloat(loanTerm) * 12;
@@ -47,10 +48,10 @@ export default function MortgageCalculator() {
         totalInterest += interest;
         schedule.push({
           month,
-          principal: principalPayment,
-          interest,
-          totalPayment: monthlyPayment,
-          remainingBalance: Math.max(0, remainingBalance)
+          principal: Math.round(principalPayment),
+          interest: Math.round(interest),
+          totalPayment: Math.round(monthlyPayment),
+          remainingBalance: Math.max(0, Math.round(remainingBalance))
         });
       }
     } else if (repaymentType === '원금균등') {
@@ -66,10 +67,10 @@ export default function MortgageCalculator() {
         totalInterest += interest;
         schedule.push({
           month,
-          principal: monthlyPrincipal,
-          interest,
-          totalPayment: payment,
-          remainingBalance: Math.max(0, remainingBalance)
+          principal: Math.round(monthlyPrincipal),
+          interest: Math.round(interest),
+          totalPayment: Math.round(payment),
+          remainingBalance: Math.max(0, Math.round(remainingBalance))
         });
       }
       monthlyPayment = schedule[0].totalPayment;
@@ -83,10 +84,10 @@ export default function MortgageCalculator() {
         const isLastMonth = month === totalMonths;
         schedule.push({
           month,
-          principal: isLastMonth ? principal : 0,
-          interest: monthlyInterest,
-          totalPayment: isLastMonth ? principal + monthlyInterest : monthlyInterest,
-          remainingBalance: isLastMonth ? 0 : principal
+          principal: isLastMonth ? Math.round(principal) : 0,
+          interest: Math.round(monthlyInterest),
+          totalPayment: isLastMonth ? Math.round(principal + monthlyInterest) : Math.round(monthlyInterest),
+          remainingBalance: isLastMonth ? 0 : Math.round(principal)
         });
       }
     }
@@ -113,14 +114,14 @@ export default function MortgageCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">대출금액 (원)</label>
               <input
-                type="number"
+                type="text"
                 value={loanAmount}
                 onChange={(e) => {
-                  setLoanAmount(e.target.value);
+                  setLoanAmount(formatNumber(e.target.value));
                   setResult(null);
                 }}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="예: 300000000"
+                placeholder="예: 300,000,000"
               />
             </div>
 
@@ -182,15 +183,15 @@ export default function MortgageCalculator() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>월 납입금:</span>
-                    <span>{result.monthlyPayment.toLocaleString()}원</span>
+                    <span>{formatNumber(result.monthlyPayment)}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>총 이자:</span>
-                    <span>{result.totalInterest.toLocaleString()}원</span>
+                    <span>{formatNumber(result.totalInterest)}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>총 상환금액:</span>
-                    <span>{result.totalPayment.toLocaleString()}원</span>
+                    <span>{formatNumber(result.totalPayment)}원</span>
                   </div>
                 </div>
 
@@ -198,21 +199,23 @@ export default function MortgageCalculator() {
                   <h4 className="font-semibold mb-2">상환 스케줄</h4>
                   <div className="max-h-60 overflow-y-auto">
                     <table className="w-full text-sm">
-                      <thead className="bg-gray-100">
+                      <thead className="bg-gray-50">
                         <tr>
                           <th className="p-2 text-left">회차</th>
                           <th className="p-2 text-right">원금</th>
                           <th className="p-2 text-right">이자</th>
+                          <th className="p-2 text-right">납입금</th>
                           <th className="p-2 text-right">잔액</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {result.paymentSchedule.map((payment, index) => (
-                          <tr key={index} className="border-b">
+                        {result.paymentSchedule.map((payment) => (
+                          <tr key={payment.month} className="border-b">
                             <td className="p-2">{payment.month}회차</td>
-                            <td className="p-2 text-right">{Math.round(payment.principal).toLocaleString()}원</td>
-                            <td className="p-2 text-right">{Math.round(payment.interest).toLocaleString()}원</td>
-                            <td className="p-2 text-right">{Math.round(payment.remainingBalance).toLocaleString()}원</td>
+                            <td className="p-2 text-right">{formatNumber(payment.principal)}원</td>
+                            <td className="p-2 text-right">{formatNumber(payment.interest)}원</td>
+                            <td className="p-2 text-right">{formatNumber(payment.totalPayment)}원</td>
+                            <td className="p-2 text-right">{formatNumber(payment.remainingBalance)}원</td>
                           </tr>
                         ))}
                       </tbody>

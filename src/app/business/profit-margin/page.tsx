@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber } from '@/utils/format';
 
 interface ProfitMarginInputs {
   revenue: string;
@@ -28,7 +29,7 @@ export default function ProfitMarginCalculator() {
     const { name, value } = e.target;
     setInputs(prev => ({
       ...prev,
-      [name]: value
+      [name]: formatNumber(value)
     }));
     setResult(null);
   };

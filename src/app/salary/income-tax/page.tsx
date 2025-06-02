@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface TaxInputs {
   monthlyIncome: string;
@@ -121,11 +122,14 @@ export default function IncomeTaxCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">월 급여 (원)</label>
               <input
-                type="number"
+                type="text"
                 name="monthlyIncome"
                 value={inputs.monthlyIncome}
-                onChange={handleInputChange}
-                placeholder="예: 3000000"
+                onChange={(e) => setInputs(prev => ({
+                  ...prev,
+                  monthlyIncome: formatNumber(e.target.value)
+                }))}
+                placeholder="예: 3,000,000"
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

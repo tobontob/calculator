@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface CalculatorInputs {
   depositType: '정기예금' | '정기적금';
@@ -12,12 +13,12 @@ interface CalculatorInputs {
 }
 
 interface CalculatorResult {
-  totalDeposit: number;
-  totalInterest: number;
-  taxAmount: number;
-  netInterest: number;
-  totalAmount: number;
-  monthlyInterest?: number;
+  totalDeposit: string;
+  totalInterest: string;
+  taxAmount: string;
+  netInterest: string;
+  totalAmount: string;
+  monthlyInterest?: string;
   effectiveRate: number;
 }
 
@@ -40,6 +41,11 @@ export default function DepositCalculator() {
         ...prev,
         [name]: value
       }));
+    } else if (name === 'amount') {
+      setInputs(prev => ({
+        ...prev,
+        [name]: formatNumber(value)
+      }));
     } else {
       const numericValue = value.replace(/[^0-9.]/g, '');
       setInputs(prev => ({
@@ -50,39 +56,61 @@ export default function DepositCalculator() {
   };
 
   const calculateDeposit = () => {
-    const principal = parseFloat(inputs.amount) || 0;
-    const rate = (parseFloat(inputs.interestRate) || 0) / 100;
+    const amount = parseFloat(inputs.amount.replace(/,/g, '')) || 0;
+    const rate = parseFloat(inputs.interestRate) || 0;
     const months = parseInt(inputs.period) || 0;
-    const taxRate = (parseFloat(inputs.taxRate) || 15.4) / 100;
+    const taxRate = parseFloat(inputs.taxRate) || 15.4;
 
+    let totalDeposit = 0;
     let totalInterest = 0;
     let monthlyInterest;
 
     if (inputs.depositType === '정기예금') {
-      // 정기예금 이자 계산
-      totalInterest = principal * rate * (months / 12);
-      if (inputs.interestPayment === '매월지급') {
-        monthlyInterest = totalInterest / months;
+      // 정기예금 계산
+      totalDeposit = amount;
+      if (inputs.interestPayment === '만기일시지급') {
+        // 만기일시지급
+        totalInterest = amount * (rate / 100) * (months / 12);
+      } else {
+        // 매월지급
+        const monthlyRate = rate / 12 / 100;
+        monthlyInterest = amount * monthlyRate;
+        totalInterest = monthlyInterest * months;
       }
     } else {
-      // 정기적금 이자 계산
-      const monthlyDeposit = principal;
-      totalInterest = (monthlyDeposit * months * (months + 1) * rate) / (2 * 12);
+      // 정기적금 계산
+      totalDeposit = amount * months;
+      const monthlyRate = rate / 12 / 100;
+      
+      if (inputs.interestPayment === '만기일시지급') {
+        // 단리 계산
+        for (let i = 0; i < months; i++) {
+          totalInterest += amount * monthlyRate * (months - i);
+        }
+      } else {
+        // 매월 이자지급
+        monthlyInterest = 0;
+        for (let i = 1; i <= months; i++) {
+          const monthInterest = amount * monthlyRate * i;
+          totalInterest += monthInterest;
+          if (i === months) {
+            monthlyInterest = monthInterest;
+          }
+        }
+      }
     }
 
-    const taxAmount = totalInterest * taxRate;
+    const taxAmount = totalInterest * (taxRate / 100);
     const netInterest = totalInterest - taxAmount;
-    const totalDeposit = inputs.depositType === '정기예금' ? principal : principal * months;
-    const totalAmount = totalDeposit + netInterest;
-    const effectiveRate = (netInterest / totalDeposit) * 100;
+    const effectiveRate = (netInterest / totalDeposit) * 100 * (12 / months);
 
     setResult({
-      totalDeposit,
-      totalInterest,
-      taxAmount,
-      netInterest,
-      totalAmount,
-      monthlyInterest,
+      totalDeposit: formatNumber(totalDeposit),
+      totalInterest: formatNumber(totalInterest),
+      taxAmount: formatNumber(taxAmount),
+      netInterest: formatNumber(netInterest),
+      totalAmount: formatNumber(totalDeposit + netInterest),
+      monthlyInterest: monthlyInterest ? formatNumber(monthlyInterest) : undefined,
       effectiveRate
     });
   };
@@ -146,23 +174,21 @@ export default function DepositCalculator() {
               />
             </div>
 
-            {inputs.depositType === '정기예금' && (
-              <div>
-                <label className="block text-gray-700 mb-2">이자 지급 방식</label>
-                <select
-                  name="interestPayment"
-                  value={inputs.interestPayment}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="만기일시지급">만기일시지급</option>
-                  <option value="매월지급">매월지급</option>
-                </select>
-              </div>
-            )}
+            <div>
+              <label className="block text-gray-700 mb-2">이자 지급 방식</label>
+              <select
+                name="interestPayment"
+                value={inputs.interestPayment}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="만기일시지급">만기일시지급</option>
+                <option value="매월지급">매월지급</option>
+              </select>
+            </div>
 
             <div>
-              <label className="block text-gray-700 mb-2">세율 (%)</label>
+              <label className="block text-gray-700 mb-2">이자 과세율 (%)</label>
               <input
                 type="text"
                 name="taxRate"
@@ -183,37 +209,37 @@ export default function DepositCalculator() {
             {result && (
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                 <h2 className="text-xl font-semibold mb-4">계산 결과</h2>
-                <div className="space-y-1 text-sm">
+                <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>총 {inputs.depositType === '정기예금' ? '예금액' : '적립액'}:</span>
-                    <span>{result.totalDeposit.toLocaleString()}원</span>
+                    <span className="font-semibold">{result.totalDeposit}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>총 이자:</span>
-                    <span>{result.totalInterest.toLocaleString()}원</span>
+                    <span className="font-semibold">{result.totalInterest}원</span>
                   </div>
-                  <div className="flex justify-between text-red-600">
-                    <span>세금:</span>
-                    <span>-{result.taxAmount.toLocaleString()}원</span>
+                  <div className="flex justify-between">
+                    <span>이자 과세:</span>
+                    <span className="font-semibold">{result.taxAmount}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>세후 이자:</span>
+                    <span className="font-semibold">{result.netInterest}원</span>
                   </div>
                   {result.monthlyInterest && (
                     <div className="flex justify-between">
                       <span>월 이자:</span>
-                      <span>{result.monthlyInterest.toLocaleString()}원</span>
+                      <span className="font-semibold">{result.monthlyInterest}원</span>
                     </div>
                   )}
+                  <div className="flex justify-between">
+                    <span>실효 금리:</span>
+                    <span className="font-semibold">{result.effectiveRate.toFixed(2)}%</span>
+                  </div>
                   <div className="border-t border-gray-300 my-2"></div>
                   <div className="flex justify-between font-semibold">
-                    <span>세후 이자:</span>
-                    <span className="text-blue-600">{result.netInterest.toLocaleString()}원</span>
-                  </div>
-                  <div className="flex justify-between font-semibold">
                     <span>만기 수령액:</span>
-                    <span className="text-blue-600">{result.totalAmount.toLocaleString()}원</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>실효 수익률:</span>
-                    <span>{result.effectiveRate.toFixed(2)}%</span>
+                    <span>{result.totalAmount}원</span>
                   </div>
                 </div>
               </div>
@@ -224,32 +250,34 @@ export default function DepositCalculator() {
         {/* 오른쪽 컬럼: 정보 및 안내 */}
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold mb-4">예금/적금 안내</h2>
+            <h2 className="text-xl font-bold mb-4">상품 안내</h2>
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded">
-                <h3 className="font-semibold text-blue-600 mb-2">상품 특징</h3>
+                <h3 className="font-semibold text-blue-600 mb-2">정기예금</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-1">
-                  <li>정기예금: 목돈을 한번에 예치하여 이자를 받는 상품</li>
-                  <li>정기적금: 매월 일정액을 적립하여 이자를 받는 상품</li>
-                  <li>이자 지급방식: 만기일시지급 또는 매월지급 선택 가능</li>
-                  <li>중도해지 시 약정금리보다 낮은 금리 적용</li>
+                  <li>목돈을 한번에 예치</li>
+                  <li>만기일시지급: 만기에 이자 수령</li>
+                  <li>매월지급: 매월 이자 수령</li>
+                  <li>중도해지 시 약정금리 감소</li>
                 </ul>
               </div>
+              
               <div className="bg-gray-50 p-4 rounded">
-                <h3 className="font-semibold text-blue-600 mb-2">이자 과세</h3>
+                <h3 className="font-semibold text-blue-600 mb-2">정기적금</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-1">
-                  <li>일반과세: 이자소득의 15.4% (소득세 14% + 지방소득세 1.4%)</li>
-                  <li>비과세종합저축: 가입대상자에 한해 세금 면제</li>
-                  <li>세금우대저축: 이자소득의 9.5% 분리과세</li>
+                  <li>매월 일정액 적립</li>
+                  <li>자동이체 추천</li>
+                  <li>중도해지 시 약정금리 감소</li>
+                  <li>목돈 마련에 유리</li>
                 </ul>
               </div>
+
               <div className="bg-gray-50 p-4 rounded">
-                <h3 className="font-semibold text-blue-600 mb-2">유의사항</h3>
+                <h3 className="font-semibold text-blue-600 mb-2">과세 정보</h3>
                 <ul className="list-disc pl-5 text-gray-600 space-y-1">
-                  <li>실제 이율은 금융기관별로 차이가 있을 수 있음</li>
-                  <li>만기 전 해지 시 중도해지이율 적용</li>
-                  <li>금리는 변동될 수 있으며, 가입시점 금리가 적용됨</li>
-                  <li>예금자보호법에 따라 5천만원까지 보호</li>
+                  <li>일반과세: 15.4% (소득세 14% + 지방소득세 1.4%)</li>
+                  <li>비과세종합저축: 가입 대상 확인 필요</li>
+                  <li>세금우대: 9.5% (소득세 8.7% + 지방소득세 0.8%)</li>
                 </ul>
               </div>
             </div>

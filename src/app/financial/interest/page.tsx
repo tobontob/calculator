@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 export default function InterestCalculator() {
   const [principal, setPrincipal] = useState('');
@@ -16,7 +17,7 @@ export default function InterestCalculator() {
   const calculateInterest = () => {
     if (!principal || !rate || !time) return;
 
-    const p = parseFloat(principal);
+    const p = parseFloat(principal.replace(/,/g, ''));
     const r = parseFloat(rate) / 100;
     const t = parseFloat(time);
     const n = parseFloat(compoundingFrequency);
@@ -39,10 +40,6 @@ export default function InterestCalculator() {
     });
   };
 
-  const formatNumber = (num: number) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8">단/복리 이자 계산기</h1>
@@ -54,11 +51,11 @@ export default function InterestCalculator() {
             <div>
               <label className="block text-gray-700 mb-2">원금 (원)</label>
               <input
-                type="number"
+                type="text"
                 value={principal}
-                onChange={(e) => setPrincipal(e.target.value)}
+                onChange={(e) => setPrincipal(formatNumber(e.target.value))}
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="예: 10000000"
+                placeholder="예: 10,000,000"
               />
             </div>
             

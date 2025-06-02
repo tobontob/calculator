@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber, parseNumber } from '@/utils/format';
 
 interface WithholdingInputs {
   incomeType: string;
@@ -32,10 +33,17 @@ export default function WithholdingTaxCalculator() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setInputs(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }));
+    if (name === 'amount') {
+      setInputs(prev => ({
+        ...prev,
+        amount: formatNumber(value)
+      }));
+    } else {
+      setInputs(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      }));
+    }
     setResult(null);
   };
 

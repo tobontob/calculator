@@ -44,6 +44,12 @@ export default function CompoundCalculator() {
         ...prev,
         [name]: value,
       }));
+    } else if (name === 'initialInvestment' || name === 'additionalInvestment') {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setInputs((prev) => ({
+        ...prev,
+        [name]: formatNumber(numericValue),
+      }));
     } else {
       const numericValue = value.replace(/[^0-9.]/g, '');
       setInputs((prev) => ({
@@ -54,10 +60,10 @@ export default function CompoundCalculator() {
   };
 
   const calculateCompoundInterest = () => {
-    const initial = Number(inputs.initialInvestment) || 0;
+    const initial = Number(inputs.initialInvestment.replace(/,/g, '')) || 0;
     const annualRate = (Number(inputs.annualReturn) || 0) / 100;
     const years = Number(inputs.investmentPeriod) || 0;
-    const additional = Number(inputs.additionalInvestment) || 0;
+    const additional = Number(inputs.additionalInvestment.replace(/,/g, '')) || 0;
 
     // 복리 계산 주기에 따른 연간 복리 횟수 설정
     let periodsPerYear = 1;

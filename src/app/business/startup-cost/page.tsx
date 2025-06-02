@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber } from '@/utils/format';
 
 interface StartupCostInputs {
   initialCosts: {
@@ -63,7 +64,7 @@ export default function StartupCostCalculator() {
         ...prev,
         [category]: {
           ...prev[category],
-          [name]: value
+          [name]: formatNumber(value)
         }
       }));
     } else {

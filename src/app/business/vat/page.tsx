@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatNumber } from '@/utils/format';
 
 interface VATInputs {
   revenue: string;
@@ -27,10 +28,17 @@ export default function VATCalculator() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setInputs(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (e.target instanceof HTMLInputElement && e.target.type === 'text') {
+      setInputs(prev => ({
+        ...prev,
+        [name]: formatNumber(value)
+      }));
+    } else {
+      setInputs(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
     setResult(null);
   };
 

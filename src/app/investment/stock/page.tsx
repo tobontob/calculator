@@ -36,16 +36,24 @@ export default function StockCalculator() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInputs(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (name === 'buyPrice' || name === 'currentPrice' || name === 'quantity') {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setInputs(prev => ({
+        ...prev,
+        [name]: formatNumber(numericValue)
+      }));
+    } else {
+      setInputs(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const calculateReturns = () => {
-    const quantity = parseFloat(inputs.quantity) || 0;
-    const buyPrice = parseFloat(inputs.buyPrice) || 0;
-    const currentPrice = parseFloat(inputs.currentPrice) || 0;
+    const quantity = parseFloat(inputs.quantity.replace(/,/g, '')) || 0;
+    const buyPrice = parseFloat(inputs.buyPrice.replace(/,/g, '')) || 0;
+    const currentPrice = parseFloat(inputs.currentPrice.replace(/,/g, '')) || 0;
     const tradingFee = parseFloat(inputs.tradingFee) || 0.015;
 
     const totalBuyAmount = quantity * buyPrice;
@@ -61,10 +69,6 @@ export default function StockCalculator() {
       returnRate,
       totalFee,
     });
-  };
-
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('ko-KR').format(Math.round(num));
   };
 
   return (
