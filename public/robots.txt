@@ -1,6 +1,10 @@
 User-agent: *
 Allow: /
-Sitemap: https://your-domain.com/sitemap.xml
+
+User-agent: Yeti
+Allow: /
+
+Sitemap: hhttps://calculator.ai.kr/sitemap.xml
 
 # Allow all crawlers
 User-agent: *
