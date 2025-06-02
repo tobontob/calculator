@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   verification: {
     google: '7vfmZg7MxwmARCQcGZbFUhv5DBtoDTv81onwUFe4KWA',
   },
+  other: {
+    'naver-site-verification': 'b74d70e6f3a32e82ca300a71e57242ff677527d6',
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -47,6 +50,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        <meta name="naver-site-verification" content="b74d70e6f3a32e82ca300a71e57242ff677527d6" />
+      </head>
       <body className={inter.className}>
         <div id="header-wrapper" className="fixed top-0 left-0 right-0 z-30 transition-colors duration-500">
           <header className="bg-white shadow-sm">
