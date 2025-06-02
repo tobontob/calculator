@@ -1,26 +1,9 @@
 import axios from 'axios';
 
-// 한국수출입은행 환율 API 응답 타입
-interface ExchangeRateResponse {
-  result: number;
-  cur_unit: string;
-  ttb: string;  // 전신환 매입률
-  tts: string;  // 전신환 매도률
-  deal_bas_r: string;  // 기준율
-  bkpr: string;  // 장부가격
-  yy_efee_r: string;  // 연환가료율
-  ten_dd_efee_r: string;  // 10일환가료율
-  kftc_bkpr: string;  // 서울외국환중개 매매기준율
-  kftc_deal_bas_r: string;  // 서울외국환중개 장부가격
-  cur_nm: string;  // 통화명
-}
-
 // 환율 정보 타입
 export interface ExchangeRateInfo {
   rate: number;
   name: string;
-  buy: number;  // 매입률
-  sell: number; // 매도률
   lastUpdate?: string; // 마지막 업데이트 시간
 }
 
@@ -28,36 +11,73 @@ export interface ExchangeRates {
   [key: string]: ExchangeRateInfo;
 }
 
-// API 키 확인
-const API_KEY = process.env.NEXT_PUBLIC_EXCHANGE_API_KEY;
-if (!API_KEY) {
-  console.error('환율 API 키가 설정되지 않았습니다. (.env.local 파일에 NEXT_PUBLIC_EXCHANGE_API_KEY를 설정해주세요)');
-}
+const CACHE_KEY = 'exchangeRates';
+const CACHE_DURATION = 60 * 60 * 1000; // 1시간
 
-// API 호출 함수
-export async function fetchExchangeRates(): Promise<ExchangeRates> {
+// 캐시된 환율 정보 가져오기
+const getCachedRates = (): ExchangeRates | null => {
+  if (typeof window === 'undefined') return null;
+  
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (!cached) return null;
+
   try {
-    const response = await axios.get('/api/exchange');
-    
-    if (!response.data) {
-      throw new Error('유효하지 않은 API 응답');
+    const { data, timestamp } = JSON.parse(cached);
+    if (Date.now() - timestamp > CACHE_DURATION) {
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    localStorage.removeItem(CACHE_KEY);
+    return null;
+  }
+};
+
+// 환율 정보 캐시에 저장
+const cacheRates = (rates: ExchangeRates) => {
+  if (typeof window === 'undefined') return;
+  
+  localStorage.setItem(CACHE_KEY, JSON.stringify({
+    data: rates,
+    timestamp: Date.now()
+  }));
+};
+
+// 환율 정보 가져오기
+export const fetchExchangeRates = async (): Promise<ExchangeRates> => {
+  try {
+    // 캐시된 데이터 확인
+    const cached = getCachedRates();
+    if (cached) {
+      return cached;
     }
 
-    // 현재 시간을 lastUpdate로 추가
-    const currentTime = new Date().toISOString();
-    const exchangeRates: ExchangeRates = {};
+    // API 호출
+    const response = await axios.get('/api/exchange');
     
-    Object.entries(response.data).forEach(([currency, info]: [string, any]) => {
-      exchangeRates[currency] = {
-        ...info,
-        lastUpdate: currentTime
-      };
-    });
+    if (!response.data || typeof response.data !== 'object') {
+      throw new Error('유효하지 않은 응답 데이터');
+    }
 
-    return exchangeRates;
+    // 응답에 error 필드가 있는지 확인
+    if ('error' in response.data) {
+      throw new Error(response.data.error);
+    }
+
+    // 데이터 캐시에 저장
+    cacheRates(response.data);
+    
+    return response.data;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
-    console.error('환율 정보를 가져오는데 실패했습니다:', errorMessage);
+    console.error('환율 정보 조회 실패:', error);
+    
+    // 캐시된 데이터가 있다면 사용
+    const cached = getCachedRates();
+    if (cached) {
+      return cached;
+    }
+    
     throw error;
   }
-} 
+}; 

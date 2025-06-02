@@ -27,16 +27,36 @@ export default function ExchangeCalculator() {
   });
 
   const [result, setResult] = useState<ExchangeResult | null>(null);
-  const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>({
-    USD: { rate: 1300, name: '미국 달러', buy: 1290, sell: 1310 },
-    JPY: { rate: 9.5, name: '일본 엔', buy: 9.4, sell: 9.6 },
-    EUR: { rate: 1450, name: '유로', buy: 1440, sell: 1460 },
-    CNY: { rate: 180, name: '중국 위안', buy: 178, sell: 182 },
-    GBP: { rate: 1650, name: '영국 파운드', buy: 1640, sell: 1660 }
-  });
-  const [loading, setLoading] = useState(false);
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdate, setLastUpdate] = useState<string | null>(new Date().toLocaleString('ko-KR'));
+  const [lastUpdate, setLastUpdate] = useState<string | null>(null);
+
+  // 환율 정보 가져오기
+  const fetchRates = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const rates = await fetchExchangeRates();
+      setExchangeRates(rates);
+      setLastUpdate(new Date().toLocaleString('ko-KR'));
+    } catch (err) {
+      setError('환율 정보를 가져오는데 실패했습니다. 잠시 후 다시 시도해주세요.');
+      console.error('환율 정보 조회 실패:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 환율 정보 가져오기
+  useEffect(() => {
+    fetchRates();
+
+    // 1시간마다 환율 정보 갱신
+    const interval = setInterval(fetchRates, 60 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -60,38 +80,55 @@ export default function ExchangeCalculator() {
     const amount = parseFloat(inputs.amount.replace(/,/g, '')) || 0;
     let rate = 1;
     let commission = 0;
-    let buyRate: number | undefined;
-    let sellRate: number | undefined;
 
-    if (inputs.fromCurrency === 'KRW') {
-      rate = 1 / exchangeRates[inputs.toCurrency].rate;
-      commission = amount * 0.015; // 1.5% 수수료
-      sellRate = 1 / exchangeRates[inputs.toCurrency].sell;
+    // 같은 통화면 1:1 환율 적용
+    if (inputs.fromCurrency === inputs.toCurrency) {
+      setResult({
+        convertedAmount: amount,
+        exchangeRate: 1,
+        commission: 0,
+        totalAmount: amount
+      });
+      return;
+    }
+
+    if (inputs.fromCurrency === 'KRW' && inputs.toCurrency === 'USD') {
+      // KRW -> USD (기준 환율의 역수)
+      rate = 1 / exchangeRates['USD'].rate;
+      commission = Math.round(amount * 0.015); // 1.5% 수수료
+    } else if (inputs.fromCurrency === 'USD' && inputs.toCurrency === 'KRW') {
+      // USD -> KRW (기준 환율)
+      rate = exchangeRates['USD'].rate;
+      commission = Math.round(amount * rate * 0.015); // 1.5% 수수료
+    } else if (inputs.fromCurrency === 'KRW') {
+      // KRW -> 기타 통화
+      const usdRate = 1 / exchangeRates['USD'].rate; // KRW -> USD 환율
+      const targetRate = exchangeRates[inputs.toCurrency].rate; // USD -> 목표통화 환율
+      rate = usdRate / (targetRate / exchangeRates['USD'].rate);
+      commission = Math.round(amount * 0.02); // 2% 수수료
     } else if (inputs.toCurrency === 'KRW') {
-      rate = exchangeRates[inputs.fromCurrency].rate;
-      commission = amount * rate * 0.015; // 1.5% 수수료
-      buyRate = exchangeRates[inputs.fromCurrency].buy;
+      // 기타 통화 -> KRW
+      const sourceRate = exchangeRates[inputs.fromCurrency].rate; // 출발통화 -> KRW 환율
+      rate = sourceRate;
+      commission = Math.round(amount * rate * 0.015); // 1.5% 수수료
     } else {
+      // 기타 통화 간 환전
       const fromRate = exchangeRates[inputs.fromCurrency].rate;
       const toRate = exchangeRates[inputs.toCurrency].rate;
       rate = fromRate / toRate;
-      commission = amount * fromRate * 0.02; // 2% 수수료 (크로스환율)
-      buyRate = exchangeRates[inputs.fromCurrency].buy;
-      sellRate = 1 / exchangeRates[inputs.toCurrency].sell;
+      commission = Math.round(amount * fromRate * 0.02); // 2% 수수료
     }
 
-    const convertedAmount = amount * rate;
+    const convertedAmount = Math.round(amount * rate);
     const totalAmount = inputs.fromCurrency === 'KRW' ? 
-      amount + commission : 
-      (amount * rate) + commission;
+      Math.round(amount + commission) : 
+      Math.round((amount * rate) + commission);
 
     setResult({
       convertedAmount,
-      exchangeRate: rate,
+      exchangeRate: Math.round(rate * 100) / 100, // 소수점 2자리까지만 표시
       commission,
-      totalAmount,
-      buyRate,
-      sellRate
+      totalAmount
     });
   };
 
@@ -185,20 +222,8 @@ export default function ExchangeCalculator() {
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span>기준 환율:</span>
-                    <span className="text-blue-600">1 {inputs.fromCurrency} = {result.exchangeRate.toFixed(4)} {inputs.toCurrency}</span>
+                    <span className="text-blue-600">1 {inputs.fromCurrency} = {result.exchangeRate.toLocaleString()} {inputs.toCurrency}</span>
                   </div>
-                  {result.buyRate && (
-                    <div className="flex justify-between">
-                      <span>매입 환율:</span>
-                      <span className="text-green-600">1 {inputs.fromCurrency} = {result.buyRate.toFixed(4)} KRW</span>
-                    </div>
-                  )}
-                  {result.sellRate && (
-                    <div className="flex justify-between">
-                      <span>매도 환율:</span>
-                      <span className="text-red-600">1 {inputs.toCurrency} = {(1/result.sellRate).toFixed(4)} KRW</span>
-                    </div>
-                  )}
                   <div className="flex justify-between">
                     <span>환전 금액:</span>
                     <span className="text-green-600">{result.convertedAmount.toLocaleString()} {inputs.toCurrency}</span>
@@ -225,13 +250,12 @@ export default function ExchangeCalculator() {
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded">
                 <h3 className="font-semibold text-blue-600 mb-2">주요 통화 기준환율</h3>
-                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                <ul className="space-y-2">
                   {exchangeRates && Object.entries(exchangeRates).map(([currency, info]) => (
-                    <li key={currency}>
+                    <li key={currency} className="mb-4 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
                       {info.name} ({currency}): {info.rate.toLocaleString()} 원
-                      <div className="text-sm ml-5">
-                        <div>매입: {info.buy.toLocaleString()} 원</div>
-                        <div>매도: {info.sell.toLocaleString()} 원</div>
+                      <div className="text-sm ml-5 text-gray-600">
+                        마지막 업데이트: {new Date(info.lastUpdate || '').toLocaleString()}
                       </div>
                     </li>
                   ))}
