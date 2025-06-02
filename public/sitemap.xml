@@ -2,41 +2,85 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://calculator.ai.kr/</loc>
-    <lastmod>2024-03-20</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-  
+
+  <!-- 일상 계산기 -->
+  <url>
+    <loc>https://calculator.ai.kr/daily/exchange</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/daily/household-debt</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/daily/personal-loan</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/daily/overdue</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/daily/card-installment</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- 수학 계산기 -->
   <url>
     <loc>https://calculator.ai.kr/math/basic</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2024-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://calculator.ai.kr/math/scientific</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2024-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://calculator.ai.kr/math/unit-converter</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/math/converter</loc>
+    <lastmod>2024-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- 재무 계산기 -->
+  <!-- 금융 계산기 -->
   <url>
     <loc>https://calculator.ai.kr/financial/loan</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2024-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://calculator.ai.kr/financial/interest</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/financial/deposit</loc>
+    <lastmod>2024-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -44,19 +88,135 @@
   <!-- 건강 계산기 -->
   <url>
     <loc>https://calculator.ai.kr/health/bmi</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2024-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://calculator.ai.kr/health/calorie</loc>
-    <lastmod>2024-03-20</lastmod>
+    <loc>https://calculator.ai.kr/health/calories</loc>
+    <lastmod>2024-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://calculator.ai.kr/health/bodyfat</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 부동산 계산기 -->
+  <url>
+    <loc>https://calculator.ai.kr/real-estate/mortgage</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/real-estate/tax</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/real-estate/rent</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/real-estate/housing</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 급여 계산기 -->
+  <url>
+    <loc>https://calculator.ai.kr/salary/income-tax</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/salary/severance</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/salary/withholding</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/salary/year-end</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/salary/after-tax</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 사업 계산기 -->
+  <url>
+    <loc>https://calculator.ai.kr/business/corporate-tax</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/business/income-tax</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/business/profit-margin</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/business/vat</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 투자 계산기 -->
+  <url>
+    <loc>https://calculator.ai.kr/investment/fund</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/investment/savings</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/investment/stock</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/investment/compound</loc>
+    <lastmod>2024-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calculator.ai.kr/investment/deposit</loc>
+    <lastmod>2024-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
