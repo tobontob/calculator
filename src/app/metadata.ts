@@ -18,7 +18,9 @@ const metadata: Metadata = {
   },
   verification: {
     google: 'google-site-verification-code',
-    naver: 'naver-site-verification-code',
+    other: {
+      'naver-site-verification': 'naver-site-verification-code'
+    }
   },
   alternates: {
     canonical: 'https://calculator-ai.com',
