@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://your-domain.com/</loc>
+    <loc>https://calculator.ai.kr/</loc>
     <lastmod>2024-03-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -9,19 +9,19 @@
   
   <!-- 수학 계산기 -->
   <url>
-    <loc>https://your-domain.com/math/basic</loc>
+    <loc>https://calculator.ai.kr/math/basic</loc>
     <lastmod>2024-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/math/scientific</loc>
+    <loc>https://calculator.ai.kr/math/scientific</loc>
     <lastmod>2024-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/math/unit-converter</loc>
+    <loc>https://calculator.ai.kr/math/unit-converter</loc>
     <lastmod>2024-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -29,13 +29,13 @@
 
   <!-- 재무 계산기 -->
   <url>
-    <loc>https://your-domain.com/financial/loan</loc>
+    <loc>https://calculator.ai.kr/financial/loan</loc>
     <lastmod>2024-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/financial/interest</loc>
+    <loc>https://calculator.ai.kr/financial/interest</loc>
     <lastmod>2024-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -43,19 +43,19 @@
 
   <!-- 건강 계산기 -->
   <url>
-    <loc>https://your-domain.com/health/bmi</loc>
+    <loc>https://calculator.ai.kr/health/bmi</loc>
     <lastmod>2024-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/health/calorie</loc>
+    <loc>https://calculator.ai.kr/health/calorie</loc>
     <lastmod>2024-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/health/bodyfat</loc>
+    <loc>https://calculator.ai.kr/health/bodyfat</loc>
     <lastmod>2024-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
