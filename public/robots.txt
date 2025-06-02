@@ -4,7 +4,7 @@ Allow: /
 User-agent: Yeti
 Allow: /
 
-Sitemap: hhttps://calculator.ai.kr/sitemap.xml
+Sitemap: https://calculator.ai.kr/sitemap.xml
 
 # Allow all crawlers
 User-agent: *
