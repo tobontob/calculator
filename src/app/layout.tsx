@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   },
   other: {
     'naver-site-verification': 'b74d70e6f3a32e82ca300a71e57242ff677527d6',
+    'msvalidate.01': '5F67DA5E196AC76DF25556B56C15FC3E'
   },
   icons: {
     icon: [
