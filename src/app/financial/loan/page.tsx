@@ -111,8 +111,17 @@ export default function LoanCalculator() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold text-center mb-8">대출 계산기</h1>
+      <h1 className="text-3xl font-bold text-center mb-4">대출 계산기</h1>
       
+      <div className="bg-blue-50 p-4 rounded-lg mb-8">
+        <p className="text-gray-700 mb-2">
+          대출금 상환 방식(원리금 균등상환, 원금 균등상환, 만기일시상환)에 따른 월별 상환금액과 이자를 계산할 수 있습니다.
+        </p>
+        <p className="text-gray-700">
+          대출 기간과 금리에 따른 정확한 상환 계획을 수립하여 본인에게 맞는 최적의 대출 상환 방식을 선택해보세요.
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 계산기 섹션 */}
         <div className="bg-white rounded-lg shadow-md p-6">

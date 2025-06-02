@@ -3,13 +3,16 @@ import HamburgerMenu from '@/components/layout/HamburgerMenu';
 import Link from 'next/link';
 import { Inter } from 'next/font/google';
 import Footer from '@/components/Footer';
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
+import { baseMetadata } from './metadata.config';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: '계산기 모음',
-  description: '다양한 금융, 건강, 생활 계산기를 제공하는 웹사이트입니다.',
+  ...baseMetadata,
+  title: '계산기 AI | 무료 온라인 계산기 모음 - 금융, 세금, 건강, 부동산, 사업 계산기',
+  description: '금융 계산기(대출, 이자), 세금 계산기(소득세, 부가세), 건강 계산기(BMI, 칼로리), 부동산 계산기(담보대출, 취득세), 사업 계산기(법인세, 매출이익) 등 150+ 생활 계산기를 무료로 제공합니다.',
+  keywords: '계산기, 금융계산기, 대출계산기, 세금계산기, 건강계산기, 부동산계산기, 사업계산기',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -22,10 +25,16 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   openGraph: {
-    title: '계산기 모음',
-    description: '다양한 금융, 건강, 생활 계산기를 제공하는 웹사이트입니다.',
+    title: '계산기 AI | 무료 온라인 계산기 모음',
+    description: '150+ 무료 온라인 계산기 모음 - 금융, 세금, 건강, 부동산, 사업 계산기',
     images: '/og-image.png',
+    type: 'website',
+    siteName: '계산기 AI',
+    locale: 'ko_KR',
   },
+  alternates: {
+    canonical: 'https://calculator.ai.kr'
+  }
 }
 
 export default function RootLayout({
