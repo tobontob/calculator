@@ -1,7 +1,12 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '종합 계산기 - 금융, 건강, 수학 등 다양한 계산기 모음',
+  description: '대출, BMI, 단리/복리, 세금 등 다양한 계산기를 제공하는 종합 계산기 사이트입니다.',
+  keywords: '계산기, 대출계산기, BMI계산기, 이자계산기, 세금계산기',
+};
 
 const categories = [
   {
