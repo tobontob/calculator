@@ -50,23 +50,27 @@ export default function ExchangeCalculator() {
       }
       
       const data = await response.json();
-      if ('error' in data) {
+      if ('error' in data && typeof data.error === 'string') {
         throw new Error(data.error);
       }
 
-      setExchangeRates(data);
+      const exchangeData = data as ExchangeRates;
+      setExchangeRates(exchangeData);
       // 첫 번째 통화의 lastUpdate를 사용
-      const firstCurrency = Object.values(data)[0];
-      if (firstCurrency?.lastUpdate) {
-        const updateDate = new Date(firstCurrency.lastUpdate);
-        setLastUpdate(updateDate.toLocaleString('ko-KR', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        }));
+      const currencies = Object.values(exchangeData);
+      if (currencies.length > 0) {
+        const firstCurrency = currencies[0];
+        if (firstCurrency?.lastUpdate) {
+          const updateDate = new Date(firstCurrency.lastUpdate);
+          setLastUpdate(updateDate.toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          }));
+        }
       }
     } catch (err: any) {
       console.error('Exchange rate fetch error:', err);
