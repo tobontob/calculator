@@ -1,0 +1,6 @@
+{
+  "crons": [{
+    "path": "/api/cron/update-exchange",
+    "schedule": "0 */12 * * *"
+  }]
+} 

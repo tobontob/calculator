@@ -24,7 +24,7 @@ const CURRENCY_NAMES: { [key: string]: string } = {
 // 서버 측 캐시
 let cachedData: any = null;
 let lastFetchTime: number = 0;
-const CACHE_DURATION = 30 * 60 * 1000; // 30분
+const CACHE_DURATION = 60 * 60 * 1000; // 1시간으로 증가 (무료 계정 제한 고려)
 
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({
@@ -38,7 +38,7 @@ export async function GET() {
   try {
     const now = Date.now();
     
-    // 캐시가 있고 30분이 지나지 않았다면 캐시된 데이터 반환
+    // 캐시가 있고 1시간이 지나지 않았다면 캐시된 데이터 반환
     if (cachedData && (now - lastFetchTime) < CACHE_DURATION) {
       return NextResponse.json(cachedData);
     }

@@ -84,8 +84,8 @@ export default function ExchangeCalculator() {
   useEffect(() => {
     fetchRates();
     
-    // 30분마다 환율 정보 갱신
-    const interval = setInterval(fetchRates, 30 * 60 * 1000);
+    // 1시간마다 환율 정보 갱신
+    const interval = setInterval(fetchRates, 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
