@@ -41,7 +41,13 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: 'https://calculator.ai.kr'
-  }
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Calculator Hub - 다양한 계산기 모음',
+    description: '환율, 대출, 세금, 건강 등 다양한 계산기를 제공하는 서비스입니다.',
+    images: ['https://calculator.ai.kr/og-image.png'],
+  },
 }
 
 export default function RootLayout({
