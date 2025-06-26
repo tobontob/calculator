@@ -3,7 +3,10 @@
  * @param value - 포맷팅할 숫자 또는 문자열
  * @returns 포맷팅된 문자열
  */
-export function formatNumber(value: string | number): string {
+export function formatNumber(value: string | number | undefined | null): string {
+  if (value === undefined || value === null) {
+    return '0';
+  }
   const num = typeof value === 'string' ? value.replace(/[^0-9]/g, '') : value.toString();
   return num.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }

@@ -31,8 +31,8 @@ const axiosInstance = axios.create({
 
 export async function GET() {
   try {
-    const response = await axiosInstance.get(BASE_URL);
-    const data = response.data;
+    const axiosResponse = await axiosInstance.get(BASE_URL);
+    const data = axiosResponse.data;
     
     if (!data || !data.rates || !data.time_last_update_utc) {
       console.error('Invalid API response structure:', data);
@@ -78,11 +78,13 @@ export async function GET() {
       console.warn(`Missing currencies: ${missingCurrencies.join(', ')}`);
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ...exchangeRates,
       lastUpdate: new Date(data.time_last_update_utc).toISOString(),
       nextUpdate: data.time_next_update_utc ? new Date(data.time_next_update_utc).toISOString() : null
     });
+    response.headers.set('Cache-Control', 'no-store');
+    return response;
     
   } catch (error: any) {
     console.error('Exchange rate fetch failed:', error.message);

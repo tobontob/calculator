@@ -37,7 +37,6 @@ export default function ExchangeCalculator() {
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdate, setLastUpdate] = useState<string | null>(null);
 
   // 환율 정보 가져오기
   const fetchRates = async () => {
@@ -56,22 +55,6 @@ export default function ExchangeCalculator() {
 
       const exchangeData = data as ExchangeRates;
       setExchangeRates(exchangeData);
-      // 첫 번째 통화의 lastUpdate를 사용
-      const currencies = Object.values(exchangeData);
-      if (currencies.length > 0) {
-        const firstCurrency = currencies[0];
-        if (firstCurrency?.lastUpdate) {
-          const updateDate = new Date(firstCurrency.lastUpdate);
-          setLastUpdate(updateDate.toLocaleString('ko-KR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-          }));
-        }
-      }
     } catch (err: any) {
       console.error('Exchange rate fetch error:', err);
       setError(err.message || '환율 정보를 가져오는데 실패했습니다.');
@@ -196,16 +179,6 @@ export default function ExchangeCalculator() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8">환율 계산기</h1>
       
-      {/* 마지막 업데이트 시간 표시 */}
-      {lastUpdate && (
-        <div className="text-right text-sm text-gray-600 mb-4">
-          <div>마지막 업데이트: {lastUpdate}</div>
-          <div className="text-xs text-gray-500">
-            * 환율 정보가 업데이트되지 않는 경우 support@exchangerate-api.com으로 문의해주세요.
-          </div>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 계산기 섹션 */}
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -298,14 +271,16 @@ export default function ExchangeCalculator() {
               <div className="bg-gray-50 p-4 rounded">
                 <h3 className="font-semibold text-blue-600 mb-2">주요 통화 기준환율</h3>
                 <div className="space-y-2">
-                  {exchangeRates && Object.entries(exchangeRates).map(([currency, info]) => (
-                    <div key={currency} className="p-3 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-center">
-                        <span>{info.name} ({currency})</span>
-                        <span className="font-semibold">{formatNumber(info.rate)} 원</span>
+                  {exchangeRates && Object.entries(exchangeRates)
+                    .filter(([currency]) => ['KRW','USD','JPY','EUR','CNY','GBP'].includes(currency))
+                    .map(([currency, info]) => (
+                      <div key={currency} className="p-3 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-center">
+                          <span>{info.name} ({currency})</span>
+                          <span className="font-semibold">{formatNumber(info.rate)} 원</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
               
