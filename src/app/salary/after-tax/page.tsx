@@ -34,42 +34,42 @@ export default function AfterTaxCalculator() {
     const longTermCareRate = 0.1227; // 건강보험료의 12.27%
     const employmentInsuranceRate = 0.009; // 0.9%
 
-    // 4대 보험 계산
-    const nationalPension = Math.min(grossIncome * nationalPensionRate, 235800); // 상한액 적용
-    const healthInsurance = grossIncome * healthInsuranceRate;
-    const longTermCare = healthInsurance * longTermCareRate;
-    const employmentInsurance = grossIncome * employmentInsuranceRate;
+    // 4대 보험 계산 (반올림 적용)
+    const nationalPension = Math.round(Math.min(grossIncome * nationalPensionRate, 235800)); // 상한액 적용
+    const healthInsurance = Math.round(grossIncome * healthInsuranceRate);
+    const longTermCare = Math.round(healthInsurance * longTermCareRate);
+    const employmentInsurance = Math.round(grossIncome * employmentInsuranceRate);
 
     // 과세표준 계산 (간소화된 버전)
     const taxableIncome = grossIncome - nationalPension - healthInsurance - 
                          longTermCare - employmentInsurance;
 
-    // 소득세 계산 (간소화된 버전)
+    // 소득세 계산 (간소화된 버전, 반올림 적용)
     let incomeTax = 0;
     if (taxableIncome <= 1200000) {
-      incomeTax = taxableIncome * 0.06;
+      incomeTax = Math.round(taxableIncome * 0.06);
     } else if (taxableIncome <= 4600000) {
-      incomeTax = 72000 + (taxableIncome - 1200000) * 0.15;
+      incomeTax = Math.round(72000 + (taxableIncome - 1200000) * 0.15);
     } else if (taxableIncome <= 8800000) {
-      incomeTax = 582000 + (taxableIncome - 4600000) * 0.24;
+      incomeTax = Math.round(582000 + (taxableIncome - 4600000) * 0.24);
     } else if (taxableIncome <= 15000000) {
-      incomeTax = 1590000 + (taxableIncome - 8800000) * 0.35;
+      incomeTax = Math.round(1590000 + (taxableIncome - 8800000) * 0.35);
     } else {
-      incomeTax = 3760000 + (taxableIncome - 15000000) * 0.38;
+      incomeTax = Math.round(3760000 + (taxableIncome - 15000000) * 0.38);
     }
 
-    // 지방소득세 (소득세의 10%)
-    const localIncomeTax = incomeTax * 0.1;
+    // 지방소득세 (소득세의 10%, 반올림 적용)
+    const localIncomeTax = Math.round(incomeTax * 0.1);
 
-    // 총 공제액
-    const totalDeduction = nationalPension + healthInsurance + longTermCare + 
-                          employmentInsurance + incomeTax + localIncomeTax;
+    // 총 공제액 (반올림 적용)
+    const totalDeduction = Math.round(nationalPension + healthInsurance + longTermCare + 
+                          employmentInsurance + incomeTax + localIncomeTax);
 
-    // 실수령액
-    const netIncome = grossIncome - totalDeduction;
+    // 실수령액 (반올림 적용)
+    const netIncome = Math.round(grossIncome - totalDeduction);
 
     setResult({
-      grossIncome,
+      grossIncome: Math.round(grossIncome),
       nationalPension,
       healthInsurance,
       longTermCare,

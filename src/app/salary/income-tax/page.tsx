@@ -43,70 +43,73 @@ export default function IncomeTaxCalculator() {
   };
 
   const calculateTax = () => {
-    const monthlyIncome = parseFloat(inputs.monthlyIncome) || 0;
+    const monthlyIncome = parseFloat(parseNumber(inputs.monthlyIncome)) || 0;
     const yearlyIncome = monthlyIncome * 12;
     const dependents = parseInt(inputs.dependents) || 1;
     
-    // 1. 기본공제 계산
-    let totalDeduction = 1500000 * dependents; // 기본공제: 1인당 150만원
+    // 1. 기본공제 계산 (본인 1명 + 부양가족)
+    let totalDeduction = 1500000; // 본인 기본공제 150만원
+    if (dependents > 1) {
+      totalDeduction += 1500000 * (dependents - 1); // 부양가족 추가 공제
+    }
 
     // 2. 추가공제 계산
     if (inputs.isDisabled) totalDeduction += 2000000; // 장애인 공제 200만원
     if (inputs.is65Above) totalDeduction += 1000000; // 경로우대 공제 100만원
     if (inputs.isSingleParent) totalDeduction += 1000000; // 한부모 공제 100만원
 
-    // 3. 근로소득공제 계산
+    // 3. 근로소득공제 계산 (연간 기준)
     let workIncomeDeduction = 0;
     if (yearlyIncome <= 5000000) {
-      workIncomeDeduction = yearlyIncome * 0.7;
+      workIncomeDeduction = Math.round(yearlyIncome * 0.7);
     } else if (yearlyIncome <= 15000000) {
-      workIncomeDeduction = 3500000 + (yearlyIncome - 5000000) * 0.4;
+      workIncomeDeduction = Math.round(3500000 + (yearlyIncome - 5000000) * 0.4);
     } else if (yearlyIncome <= 45000000) {
-      workIncomeDeduction = 7500000 + (yearlyIncome - 15000000) * 0.15;
+      workIncomeDeduction = Math.round(7500000 + (yearlyIncome - 15000000) * 0.15);
     } else if (yearlyIncome <= 100000000) {
-      workIncomeDeduction = 12000000 + (yearlyIncome - 45000000) * 0.05;
+      workIncomeDeduction = Math.round(12000000 + (yearlyIncome - 45000000) * 0.05);
     } else {
-      workIncomeDeduction = 14750000 + (yearlyIncome - 100000000) * 0.02;
+      workIncomeDeduction = Math.round(14750000 + (yearlyIncome - 100000000) * 0.02);
     }
 
     // 4. 과세표준 계산
     const taxableIncome = Math.max(0, yearlyIncome - totalDeduction - workIncomeDeduction);
 
-    // 5. 소득세 계산 (누진세율 적용)
+    // 5. 소득세 계산 (누진세율 적용, 반올림)
     let incomeTax = 0;
     if (taxableIncome <= 12000000) {
-      incomeTax = taxableIncome * 0.06;
+      incomeTax = Math.round(taxableIncome * 0.06);
     } else if (taxableIncome <= 46000000) {
-      incomeTax = 720000 + (taxableIncome - 12000000) * 0.15;
+      incomeTax = Math.round(720000 + (taxableIncome - 12000000) * 0.15);
     } else if (taxableIncome <= 88000000) {
-      incomeTax = 5820000 + (taxableIncome - 46000000) * 0.24;
+      incomeTax = Math.round(5820000 + (taxableIncome - 46000000) * 0.24);
     } else if (taxableIncome <= 150000000) {
-      incomeTax = 15900000 + (taxableIncome - 88000000) * 0.35;
+      incomeTax = Math.round(15900000 + (taxableIncome - 88000000) * 0.35);
     } else if (taxableIncome <= 300000000) {
-      incomeTax = 37600000 + (taxableIncome - 150000000) * 0.38;
+      incomeTax = Math.round(37600000 + (taxableIncome - 150000000) * 0.38);
     } else if (taxableIncome <= 500000000) {
-      incomeTax = 94600000 + (taxableIncome - 300000000) * 0.40;
+      incomeTax = Math.round(94600000 + (taxableIncome - 300000000) * 0.40);
     } else {
-      incomeTax = 174600000 + (taxableIncome - 500000000) * 0.42;
+      incomeTax = Math.round(174600000 + (taxableIncome - 500000000) * 0.42);
     }
 
-    // 6. 지방소득세 계산 (소득세의 10%)
-    const localIncomeTax = incomeTax * 0.1;
+    // 6. 지방소득세 계산 (소득세의 10%, 반올림)
+    const localIncomeTax = Math.round(incomeTax * 0.1);
 
-    // 7. 월 기준으로 환산
-    const monthlyTaxableIncome = taxableIncome / 12;
-    const monthlyIncomeTax = incomeTax / 12;
-    const monthlyLocalTax = localIncomeTax / 12;
+    // 7. 월 기준으로 환산 (반올림)
+    const monthlyTaxableIncome = Math.round(taxableIncome / 12);
+    const monthlyIncomeTax = Math.round(incomeTax / 12);
+    const monthlyLocalTax = Math.round(localIncomeTax / 12);
     const monthlyTotalTax = monthlyIncomeTax + monthlyLocalTax;
     const monthlyNetIncome = monthlyIncome - monthlyTotalTax;
 
     setResult({
-      monthlyIncome: monthlyIncome,
+      monthlyIncome: Math.round(monthlyIncome),
       taxableIncome: monthlyTaxableIncome,
       incomeTax: monthlyIncomeTax,
       localIncomeTax: monthlyLocalTax,
       totalTax: monthlyTotalTax,
-      netIncome: monthlyNetIncome
+      netIncome: Math.round(monthlyNetIncome)
     });
   };
 
@@ -206,28 +209,28 @@ export default function IncomeTaxCalculator() {
                     <div className="space-y-1 text-sm">
                       <div className="flex justify-between">
                         <span>총 급여:</span>
-                        <span>{result.monthlyIncome.toLocaleString()}원</span>
+                        <span>{formatNumber(result.monthlyIncome)}원</span>
                       </div>
                       <div className="flex justify-between">
                         <span>과세표준:</span>
-                        <span>{Math.round(result.taxableIncome).toLocaleString()}원</span>
+                        <span>{formatNumber(result.taxableIncome)}원</span>
                       </div>
                       <div className="flex justify-between">
                         <span>소득세:</span>
-                        <span>{Math.round(result.incomeTax).toLocaleString()}원</span>
+                        <span>{formatNumber(result.incomeTax)}원</span>
                       </div>
                       <div className="flex justify-between">
                         <span>지방소득세:</span>
-                        <span>{Math.round(result.localIncomeTax).toLocaleString()}원</span>
+                        <span>{formatNumber(result.localIncomeTax)}원</span>
                       </div>
                       <div className="border-t border-gray-300 my-2"></div>
                       <div className="flex justify-between font-semibold">
                         <span>총 세금:</span>
-                        <span className="text-red-600">{Math.round(result.totalTax).toLocaleString()}원</span>
+                        <span className="text-red-600">{formatNumber(result.totalTax)}원</span>
                       </div>
                       <div className="flex justify-between font-semibold">
                         <span>실수령액:</span>
-                        <span className="text-blue-600">{Math.round(result.netIncome).toLocaleString()}원</span>
+                        <span className="text-blue-600">{formatNumber(result.netIncome)}원</span>
                       </div>
                     </div>
                   </div>
