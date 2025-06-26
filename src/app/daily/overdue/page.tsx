@@ -22,9 +22,9 @@ export default function OverdueCalculator() {
   const [result, setResult] = useState<CalculationResult | null>(null);
 
   const calculateOverdueInterest = () => {
-    const amount = parseFloat(principal.replace(/,/g, ''));
-    const annualRate = parseFloat(interestRate);
-    const days = parseInt(overdueDays);
+    const amount = parseFloat(parseNumber(principal)) || 0;
+    const annualRate = parseFloat(interestRate) || 0;
+    const days = parseInt(overdueDays) || 0;
     const dailyRate = annualRate / 365 / 100;
 
     if (isNaN(amount) || isNaN(annualRate) || isNaN(days)) {
@@ -32,8 +32,8 @@ export default function OverdueCalculator() {
       return;
     }
 
-    const dailyInterest = amount * dailyRate;
-    const overdueInterest = dailyInterest * days;
+    const dailyInterest = Math.round(amount * dailyRate);
+    const overdueInterest = Math.round(dailyInterest * days);
     const dailySchedule = [];
     let accumulatedInterest = 0;
 
@@ -42,15 +42,15 @@ export default function OverdueCalculator() {
       dailySchedule.push({
         day: i,
         interest: dailyInterest,
-        accumulatedInterest: accumulatedInterest,
-        totalAmount: amount + accumulatedInterest
+        accumulatedInterest: Math.round(accumulatedInterest),
+        totalAmount: Math.round(amount + accumulatedInterest)
       });
     }
 
     setResult({
-      overdueInterest,
-      dailyInterest,
-      totalAmount: amount + overdueInterest,
+      overdueInterest: Math.round(overdueInterest),
+      dailyInterest: Math.round(dailyInterest),
+      totalAmount: Math.round(amount + overdueInterest),
       dailySchedule
     });
   };
@@ -110,16 +110,16 @@ export default function OverdueCalculator() {
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span>일일 발생이자:</span>
-                    <span className="text-blue-600">{result.dailyInterest.toLocaleString()}원</span>
+                    <span className="text-blue-600">{formatNumber(result.dailyInterest)}원</span>
                   </div>
                   <div className="flex justify-between">
                     <span>총 연체이자:</span>
-                    <span className="text-red-600">{result.overdueInterest.toLocaleString()}원</span>
+                    <span className="text-red-600">{formatNumber(result.overdueInterest)}원</span>
                   </div>
                   <div className="border-t border-gray-300 my-2"></div>
                   <div className="flex justify-between font-semibold">
                     <span>총 납부금액:</span>
-                    <span>{result.totalAmount.toLocaleString()}원</span>
+                    <span>{formatNumber(result.totalAmount)}원</span>
                   </div>
                 </div>
 
@@ -139,8 +139,8 @@ export default function OverdueCalculator() {
                           {result.dailySchedule.map((item) => (
                             <tr key={item.day} className="border-b">
                               <td className="p-2">{item.day}일</td>
-                              <td className="p-2 text-right">{item.accumulatedInterest.toLocaleString()}원</td>
-                              <td className="p-2 text-right">{item.totalAmount.toLocaleString()}원</td>
+                              <td className="p-2 text-right">{formatNumber(item.accumulatedInterest)}원</td>
+                              <td className="p-2 text-right">{formatNumber(item.totalAmount)}원</td>
                             </tr>
                           ))}
                         </tbody>

@@ -50,7 +50,7 @@ export default function PersonalLoanCalculator() {
   };
 
   const calculateLoan = () => {
-    const principal = parseFloat(inputs.loanAmount.replace(/,/g, '')) || 0;
+    const principal = parseFloat(parseNumber(inputs.loanAmount)) || 0;
     const annualRate = parseFloat(inputs.interestRate) || 0;
     const months = parseInt(inputs.loanTerm) || 0;
     const monthlyRate = annualRate / 12 / 100;
@@ -74,10 +74,10 @@ export default function PersonalLoanCalculator() {
 
         schedule.push({
           month: i,
-          payment: formatNumber(monthlyPayment),
-          principal: formatNumber(principalPayment),
-          interest: formatNumber(interestPayment),
-          balance: formatNumber(Math.max(0, remainingBalance))
+          payment: formatNumber(Math.round(monthlyPayment)),
+          principal: formatNumber(Math.round(principalPayment)),
+          interest: formatNumber(Math.round(interestPayment)),
+          balance: formatNumber(Math.max(0, Math.round(remainingBalance)))
         });
       }
     } else {
@@ -92,18 +92,18 @@ export default function PersonalLoanCalculator() {
 
         schedule.push({
           month: i,
-          payment: formatNumber(monthlyPayment),
-          principal: formatNumber(monthlyPrincipal),
-          interest: formatNumber(interestPayment),
-          balance: formatNumber(Math.max(0, remainingBalance))
+          payment: formatNumber(Math.round(monthlyPayment)),
+          principal: formatNumber(Math.round(monthlyPrincipal)),
+          interest: formatNumber(Math.round(interestPayment)),
+          balance: formatNumber(Math.max(0, Math.round(remainingBalance)))
         });
       }
     }
 
     setResult({
-      monthlyPayment: formatNumber(monthlyPayment),
-      totalInterest: formatNumber(totalInterest),
-      totalPayment: formatNumber(principal + totalInterest),
+      monthlyPayment: formatNumber(Math.round(monthlyPayment)),
+      totalInterest: formatNumber(Math.round(totalInterest)),
+      totalPayment: formatNumber(Math.round(principal + totalInterest)),
       schedule
     });
   };
@@ -194,22 +194,22 @@ export default function PersonalLoanCalculator() {
                 <div className="mt-6">
                   <h3 className="font-semibold mb-2">상환 스케줄</h3>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full">
+                    <table className="min-w-full text-xs">
                       <thead>
                         <tr className="bg-gray-100">
-                          <th className="p-2 text-left">회차</th>
-                          <th className="p-2 text-right">원금</th>
-                          <th className="p-2 text-right">이자</th>
-                          <th className="p-2 text-right">잔액</th>
+                          <th className="p-1 text-left">회차</th>
+                          <th className="p-1 text-right">원금</th>
+                          <th className="p-1 text-right">이자</th>
+                          <th className="p-1 text-right">잔액</th>
                         </tr>
                       </thead>
                       <tbody>
                         {result.schedule.map((item) => (
                           <tr key={item.month} className="border-b">
-                            <td className="p-2">{item.month}회차</td>
-                            <td className="p-2 text-right">{item.principal}원</td>
-                            <td className="p-2 text-right">{item.interest}원</td>
-                            <td className="p-2 text-right">{item.balance}원</td>
+                            <td className="p-1">{item.month}회차</td>
+                            <td className="p-1 text-right">{item.principal}원</td>
+                            <td className="p-1 text-right">{item.interest}원</td>
+                            <td className="p-1 text-right">{item.balance}원</td>
                           </tr>
                         ))}
                       </tbody>
