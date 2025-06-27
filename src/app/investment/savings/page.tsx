@@ -227,7 +227,7 @@ export default function SavingsCalculator() {
                 <div className="mt-6">
                   <h3 className="font-semibold mb-2">월별 상세내역</h3>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full">
+                    <table className="min-w-full text-xs">
                       <thead>
                         <tr className="bg-gray-100">
                           <th className="p-2 text-left">회차</th>

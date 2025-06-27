@@ -7,8 +7,9 @@ export function formatNumber(value: string | number | undefined | null): string 
   if (value === undefined || value === null) {
     return '0';
   }
-  const num = typeof value === 'string' ? value.replace(/[^0-9]/g, '') : value.toString();
-  return num.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  // 소숫점 이하 버리고 정수만 반환
+  const num = typeof value === 'string' ? Math.round(Number(value.replace(/[^0-9.]/g, ''))) : Math.round(Number(value));
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 /**
