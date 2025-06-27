@@ -267,6 +267,12 @@ export default function ExchangeCalculator() {
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-bold mb-4">실시간 환율 정보</h2>
+            {/* 최신 환율정보 업데이트 시간 표기 */}
+            {exchangeRates && exchangeRates['USD'] && exchangeRates['USD'].lastUpdate && (
+              <div className="mb-4 text-sm text-gray-500">
+                최신 환율정보 업데이트: {new Date(exchangeRates['USD'].lastUpdate).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </div>
+            )}
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded">
                 <h3 className="font-semibold text-blue-600 mb-2">주요 통화 기준환율</h3>
